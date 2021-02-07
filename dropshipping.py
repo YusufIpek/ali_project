@@ -1,4 +1,6 @@
+from dropshipping_item import DropshippingItem
 from dropshipping_filter import get_watches
+from utils import *
 import requests
 import json
 
@@ -40,21 +42,6 @@ def make_request(payload):
     return response.content
 
 
-def parse_response(content):
-    return json.loads(content)
-
-
-def write_to_file(filename, content):
-    with open(filename, "wb") as f:
-        f.write(content)
-
-
-def write_multiple_files(items):
-    for item in items:
-        write_to_file("response/"+item["id_product"]+".json",
-                      json.dumps(item).encode('utf-8'))
-
-
 def get_brands():
     request_type = "get_brands"
     payload = data_payload(request_type)
@@ -74,6 +61,7 @@ def brands_items_to_list(all_brands):
         parsed_response = parse_response(response)
         if parsed_response["num_rows"] > 0:
             items.extend(parsed_response["rows"])
+        break
     return items
 
 
@@ -88,8 +76,16 @@ def product_items_to_list(brands_items):
     for item in brands_items:
         response = parse_response(get_item(item["id_product"]))
         if response["num_rows"] > 0:
-            items.extend(response["rows"])
+            item = DropshippingItem(response["rows"][0])
+            item.image_base64 = get_item_image(item.image_path)
+            items.append(item)
+        break
     return items
+
+
+def get_item_image(url):
+    response = requests.get(url)
+    return image_byte_to_base64(response.content).decode('utf-8')
 
 
 # read config data and initialize api and user object
