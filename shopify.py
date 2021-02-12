@@ -30,6 +30,14 @@ def do_post_request(req_url, data):
     return requests.post(shopify["url"] + req_url, headers=headers, json=data)
 
 
+def do_put_request(req_url, data):
+    headers = {
+        "X-Shopify-Access-Token": shopify["key"],
+        "Content-Type": "application/json"
+    }
+    return requests.put(shopify["url"] + req_url, headers=headers, json=data)
+
+
 def get_products():
     req_url = "admin/api/2021-01/products.json"
     response = do_get_request(req_url)
@@ -49,19 +57,34 @@ def add_product(item: DropshippingItem):
                     "attachment": item.image_base64
                 }
             ],
-            "variants": [{
-                "option1": "Standard",
-                "price": item.price,
-                "currency_code": "EUR",
-                "sku": "Test"
-            }],
-            "published": False
+            "shop": {
+                "id": 50964234406,
+                "currency": "EUR"
+            },
+            "published": False,
+            "status": "draft"
         }
     }
     response = do_post_request(req_url, product)
-    print(response.headers)
-    print(response.status_code)
-    print(response.content)
+    return response
+
+
+def get_field_from_response(response, field: str):
+    resp = parse_response(response)
+    return resp['product'][field]
+
+
+def update_product(id, price):
+    req_url = "admin/api/2021-01/variants/" + str(id) + ".json"
+    data = {
+        "variant": {
+            "id": id,
+            "inventory_management": "shopify",
+            "price": str(price)
+        }
+    }
+    response = do_put_request(req_url, data)
+    return response
 
 
 init()
