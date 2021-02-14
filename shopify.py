@@ -44,6 +44,12 @@ def get_products():
     return response.content
 
 
+def get_location():
+    req_url = "/admin/api/2021-01/locations.json"
+    response = do_get_request(req_url)
+    return response.content
+
+
 def add_product(item: DropshippingItem):
     req_url = "/admin/api/2021-01/products.json"
     product = {
@@ -74,7 +80,7 @@ def get_field_from_response(response, field: str):
     return resp['product'][field]
 
 
-def update_product(id, price):
+def set_price_of_product(id, price):
     req_url = "admin/api/2021-01/variants/" + str(id) + ".json"
     data = {
         "variant": {
@@ -84,6 +90,20 @@ def update_product(id, price):
         }
     }
     response = do_put_request(req_url, data)
+    return response
+
+
+def set_inventory_of_product(inventory_item_id: int, stock: int):
+    location_response = get_location()
+    locations = parse_response(location_response)
+    location_id = locations["locations"][0]["id"]
+    req_url = "admin/api/2021-01/inventory_levels/set.json"
+    data = {
+        "location_id": location_id,
+        "inventory_item_id": inventory_item_id,
+        "available": stock
+    }
+    response = do_post_request(req_url, data)
     return response
 
 
