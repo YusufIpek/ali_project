@@ -12,19 +12,21 @@ all_brands = ds.get_brands()
 filtered_brands = ds.get_watches(ds.parse_response(all_brands)["rows"])
 
 # get all items of watches
-all_items = ds.brands_items_to_list(filtered_brands)
+all_items = ds.brands_items_to_list(filtered_brands, 5)
 
 # get detailed product info
 all_items_info = ds.product_items_to_list(all_items)
 
-response = sp.add_product(all_items_info[0])
-write_to_file("response/shopify_response.json", response.content)
+for index, item in enumerate(all_items_info):
+    response = sp.add_product(item)
+    write_to_file("response/shopify_response_" +
+                  str(index) + ".json", response.content)
 
-response = parse_response(response.content)
-variants = response["product"]["variants"]
-update = sp.set_price_of_product(variants[0]["id"], all_items_info[0].price)
+    response = parse_response(response.content)
+    variants = response["product"]["variants"]
+    update = sp.set_price_of_product(variants[0]["id"], item.price)
 
-inventory_item_id = variants[0]["inventory_item_id"]
+    inventory_item_id = variants[0]["inventory_item_id"]
 
-inventory_response = sp.set_inventory_of_product(
-    inventory_item_id, all_items_info[0].stock)
+    inventory_response = sp.set_inventory_of_product(
+        inventory_item_id, item.stock)

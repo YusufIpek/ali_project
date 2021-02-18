@@ -54,14 +54,19 @@ def get_brands_items(id_brand):
     return make_request(payload)
 
 
-def brands_items_to_list(all_brands):
+def brands_items_to_list(all_brands, limit=-1):
     items = []
+
+    if limit is not -1 and limit > 0:
+        all_brands = all_brands[:limit]
+
+    print("brands size: " + str(len(all_brands)))
+
     for brand in all_brands:
         response = get_brands_items(brand["id_brand"])
         parsed_response = parse_response(response)
         if parsed_response["num_rows"] > 0:
             items.extend(parsed_response["rows"])
-        break
     return items
 
 
@@ -79,7 +84,6 @@ def product_items_to_list(brands_items):
             item = DropshippingItem(response["rows"][0])
             item.image_base64 = get_item_image(item.image_path)
             items.append(item)
-        break
     return items
 
 
@@ -88,25 +92,24 @@ def get_item_image(url):
     return image_byte_to_base64(response.content).decode('utf-8')
 
 
-# read config data and initialize api and user object
-init()
+# # read config data and initialize api and user object
+# init()
 
-# get all brands
-all_brands = get_brands()
-write_to_file("response/brands.json", all_brands)
+# # get all brands
+# all_brands = get_brands()
+# write_to_file("response/brands.json", all_brands)
 
-# filter get only watches
-filtered_brands = get_watches(parse_response(all_brands)["rows"])
-filtered_brands_in_byte = json.dumps(filtered_brands).encode('utf-8')
-write_to_file("response/filtered_brands.json", filtered_brands_in_byte)
-
-
-# get all items of watches
-all_items = brands_items_to_list(filtered_brands)
-all_items_in_byte = json.dumps(all_items).encode('utf-8')
-write_to_file("response/filtered_brands_items.json", all_items_in_byte)
+# # filter get only watches
+# filtered_brands = get_watches(parse_response(all_brands)["rows"])
+# filtered_brands_in_byte = json.dumps(filtered_brands).encode('utf-8')
+# write_to_file("response/filtered_brands.json", filtered_brands_in_byte)
 
 
-# get detailed product info
-all_items_info = product_items_to_list(all_items)
-write_multiple_files(all_items_info)
+# # get all items of watches
+# all_items = brands_items_to_list(filtered_brands)
+# all_items_in_byte = json.dumps(all_items).encode('utf-8')
+# write_to_file("response/filtered_brands_items.json", all_items_in_byte)
+
+# # get detailed product info
+# all_items_info = product_items_to_list(all_items)
+# write_multiple_files(all_items_info)
