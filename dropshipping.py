@@ -1,8 +1,10 @@
 from dropshipping_item import DropshippingItem
-from dropshipping_filter import get_watches
+from dropshipping_filter import drop_specific_brands, get_specific_brands, get_watches
 from utils import *
 import requests
 import json
+
+requests.packages.urllib3.disable_warnings()
 
 
 def init():
@@ -25,8 +27,10 @@ def data_payload(request_type, **kwargs):
     }
     if kwargs.get("id_brand") is not None:
         data["id_brand"] = kwargs.get("id_brand")
+        data["display_attributes"] = True
     if kwargs.get('id_product') is not None:
         data["id_product"] = kwargs.get("id_product")
+        data["display_attributes"] = True
 
     payload = {
         "data": json.dumps(data)
@@ -54,20 +58,29 @@ def get_brands_items(id_brand):
     return make_request(payload)
 
 
-def brands_items_to_list(all_brands, limit=-1):
+def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True):
+    print("brands items to list:")
+
     items = []
 
     if limit is not -1 and limit > 0:
         all_brands = all_brands[:limit]
 
-    print("brands size: " + str(len(all_brands)))
-
-    for brand in all_brands:
+    for index, brand in enumerate(all_brands):
+        print(str(index) + "/" + str(len(all_brands)))
         response = get_brands_items(brand["id_brand"])
         parsed_response = parse_response(response)
         if parsed_response["num_rows"] > 0:
             items.extend(parsed_response["rows"])
-    return items
+
+    filtered = list(filter(lambda x: "icon_path" in x, items))
+    mapped = list(map(lambda x: DropshippingItem(x), filtered))
+    for item in mapped:
+        item.image_base64 = get_item_image(item.image_path)
+
+    if not keep_empty_attributes:
+        mapped = list(filter(lambda x: x.attributes_available(), mapped))
+    return mapped
 
 
 def get_item(id_product):
@@ -76,14 +89,28 @@ def get_item(id_product):
     return make_request(payload)
 
 
-def product_items_to_list(brands_items):
+def product_items_to_list(brands_items, keep_empty_attributes=True):
+    print("product items to list:")
+
     items = []
-    for item in brands_items:
+    for index, item in enumerate(brands_items):
+        print(str(index) + "/" + str(len(brands_items)))
         response = parse_response(get_item(item["id_product"]))
         if response["num_rows"] > 0:
-            item = DropshippingItem(response["rows"][0])
-            item.image_base64 = get_item_image(item.image_path)
-            items.append(item)
+            if "image_path" in response["rows"][0]:
+                item = DropshippingItem(response["rows"][0])
+            else:
+                continue
+
+            try:
+                item.image_base64 = get_item_image(item.image_path)
+            except Exception as e:
+                print("image couldn't be created for" + item.name)
+                print(item)
+                print(e)
+
+            if keep_empty_attributes or item.attributes_available():
+                items.append(item)
     return items
 
 
@@ -92,24 +119,33 @@ def get_item_image(url):
     return image_byte_to_base64(response.content).decode('utf-8')
 
 
-# # read config data and initialize api and user object
-# init()
+if False:
+    # read config data and initialize api and user object
+    init()
 
-# # get all brands
-# all_brands = get_brands()
-# write_to_file("response/brands.json", all_brands)
+    # get all brands
+    all_brands = get_brands()
+    write_to_file("response/brands.json", all_brands)
 
-# # filter get only watches
-# filtered_brands = get_watches(parse_response(all_brands)["rows"])
-# filtered_brands_in_byte = json.dumps(filtered_brands).encode('utf-8')
-# write_to_file("response/filtered_brands.json", filtered_brands_in_byte)
+    # filter get only watches
+    filtered_categories = get_watches(parse_response(all_brands)["rows"])
+    filtered_categories_in_byte = json.dumps(
+        filtered_categories).encode('utf-8')
+    write_to_file("response/filtered_categories.json",
+                  filtered_categories_in_byte)
 
+    filtered_brands = drop_specific_brands(
+        filtered_categories, "disney")
+    filtered_brands_in_byte = json.dumps(filtered_brands).encode('utf-8')
+    write_to_file("response/filtered_brands.json", filtered_brands_in_byte)
 
-# # get all items of watches
-# all_items = brands_items_to_list(filtered_brands)
-# all_items_in_byte = json.dumps(all_items).encode('utf-8')
-# write_to_file("response/filtered_brands_items.json", all_items_in_byte)
+    # get all items of watches
+    all_items = brands_items_to_list(
+        filtered_brands, keep_empty_attributes=False)
+    # all_items_in_byte = json.dumps(all_items).encode('utf-8')
+    # write_to_file("response/filtered_brands_items.json", all_items_in_byte)
+    write_multiple_files(all_items)
 
-# # get detailed product info
-# all_items_info = product_items_to_list(all_items)
-# write_multiple_files(all_items_info)
+    # # get detailed product info
+    # all_items_info = product_items_to_list(all_items, False)
+    # write_multiple_files(all_items_info)

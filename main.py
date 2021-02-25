@@ -4,6 +4,7 @@ import shopify as sp
 
 # load credentials
 ds.init()
+sp.init()
 
 # get all brands
 all_brands = ds.get_brands()
@@ -12,12 +13,12 @@ all_brands = ds.get_brands()
 filtered_brands = ds.get_watches(ds.parse_response(all_brands)["rows"])
 
 # get all items of watches
-all_items = ds.brands_items_to_list(filtered_brands, 5)
+all_items = ds.brands_items_to_list(filtered_brands, 1)
 
 # get detailed product info
-all_items_info = ds.product_items_to_list(all_items)
+# all_items_info = ds.product_items_to_list(all_items)
 
-for index, item in enumerate(all_items_info):
+for index, item in enumerate(all_items):
     response = sp.add_product(item)
     write_to_file("response/shopify_response_" +
                   str(index) + ".json", response.content)
@@ -30,3 +31,4 @@ for index, item in enumerate(all_items_info):
 
     inventory_response = sp.set_inventory_of_product(
         inventory_item_id, item.stock)
+    break

@@ -67,8 +67,7 @@ def add_product(item: DropshippingItem):
                 "id": 50964234406,
                 "currency": "EUR"
             },
-            "published": False,
-            "status": "draft"
+            "published_scope": "web"
         }
     }
     response = do_post_request(req_url, product)
@@ -107,6 +106,7 @@ def set_inventory_of_product(inventory_item_id: int, stock: int):
     return response
 
 
-init()
-products = get_products()
-write_to_file("response/shopify.json", products)
+if False:
+    init()
+    products = get_products()
+    write_to_file("response/shopify.json", products)

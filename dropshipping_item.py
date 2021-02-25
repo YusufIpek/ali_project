@@ -18,4 +18,8 @@ class DropshippingItem:
         self.image_path = data["image_path"]
         self.image_last_update = data["image_last_update"]
         self.currency = data["currency"]
+        self.attributes = data["attributes_array"]
         self.image_base64 = ""
+
+    def attributes_available(self):
+        return len(self.attributes) > 0
