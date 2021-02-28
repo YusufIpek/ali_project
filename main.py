@@ -13,13 +13,16 @@ all_brands = ds.get_brands()
 filtered_brands = ds.get_watches(ds.parse_response(all_brands)["rows"])
 
 # get all items of watches
-all_items = ds.brands_items_to_list(filtered_brands, 1)
+all_items = ds.brands_items_to_list(filtered_brands, 10, False)
 write_multiple_files(all_items)
 
 # get detailed product info
 # all_items_info = ds.product_items_to_list(all_items)
 
+print("Amount of products to add:" + str(len(all_items)))
+
 for index, item in enumerate(all_items):
+    print("processing: " + str(index+1) + "/" + str(len(all_items)))
     response = sp.add_product(item)
     write_to_file("response/shopify_response_" +
                   str(index) + ".json", response.content)
@@ -34,4 +37,3 @@ for index, item in enumerate(all_items):
         inventory_item_id, item.stock)
 
     added_to_collection = sp.add_product_to_collect(response["product"]["id"])
-    break
