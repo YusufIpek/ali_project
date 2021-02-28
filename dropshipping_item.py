@@ -26,5 +26,5 @@ class DropshippingItem:
 
     def get_gender(self):
         found = list(
-            filter(lambda x: x["group_name"].lower() is 'geschlecht', self.attributes))
+            filter(lambda x: x["group_name"].lower() == 'geschlecht', self.attributes))
         return found[0] if len(found) == 1 else None
