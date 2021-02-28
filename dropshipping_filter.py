@@ -1,5 +1,5 @@
 def get_watches(data):
-    return list(filter(lambda x: x["group"] == "WATCHES", data))
+    return list(filter(lambda x: x["group"].lower() == "watches" or x["group"].lower() == "uhren", data))
 
 
 def get_specific_brands(data, *args):

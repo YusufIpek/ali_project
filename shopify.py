@@ -56,7 +56,7 @@ def add_product(item: DropshippingItem):
         "product": {
             "title": item.name,
             "vendor": item.brand_name,
-            "body_html": f'<p>{item.brand_name}</p>',
+            "body_html": attributes_to_html(item.attributes),
             "product_type": 'Herren',
             "images": [
                 {
@@ -71,6 +71,24 @@ def add_product(item: DropshippingItem):
         }
     }
     response = do_post_request(req_url, product)
+    return response
+
+
+def add_product_to_collect(product_id):
+    req_url = "/admin/api/2021-01/collects.json"
+    data = {
+        "collect": {
+            "product_id": product_id,
+            "collection_id": 237585006758   # dropshipping category
+        }
+    }
+    response = do_post_request(req_url, data)
+    return response
+
+
+def get_all_collections():
+    req_url = "/admin/api/2021-01/custom_collections.json"
+    response = do_get_request(req_url)
     return response
 
 
