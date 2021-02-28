@@ -33,6 +33,13 @@ def do_post_request(req_url, data):
     return requests.post(shopify["url"] + req_url, headers=headers, json=data)
 
 
+def do_delete_request(req_url):
+    headers = {
+        "X-Shopify-Access-Token": shopify["key"]
+    }
+    return requests.delete(shopify["url"] + req_url, headers=headers)
+
+
 def do_put_request(req_url, data):
     headers = {
         "X-Shopify-Access-Token": shopify["key"],
@@ -76,6 +83,11 @@ def add_product(item: DropshippingItem):
             "vendor": item.brand_name,
             "body_html": attributes_to_html(item.attributes),
             "product_type": item.get_gender(),
+            "metafields": [
+                {
+                    ''
+                }
+            ],
             "images": [
                 {
                     "attachment": item.image_base64
@@ -104,6 +116,17 @@ def add_product_to_collect(product_id):
     return response
 
 
+def delete_product(product_id):
+    req_url = f"/admin/api/2021-01/products/{product_id}.json"
+    response = do_delete_request(req_url)
+    return response
+
+
+def get_products_count():
+    req_url = "/admin/api/2021-01/products/count.json"
+    return do_get_request(req_url)
+
+
 def get_all_collections():
     req_url = "/admin/api/2021-01/custom_collections.json"
     response = do_get_request(req_url)
@@ -113,9 +136,9 @@ def get_all_collections():
 def get_collection_dropshipping_id():
     response = get_all_collections()
     parsed_response = parse_response(response.content)
-    coll_dropshipping = list(filter(lambda x: x["title"].lower(
+    filtered_collections = list(filter(lambda x: x["title"].lower(
     ) == "dropshipping", parsed_response["custom_collections"]))
-    return coll_dropshipping[0]["id"]
+    return filtered_collections[0]["id"]
 
 
 def get_field_from_response(response, field: str):
@@ -152,13 +175,17 @@ def set_inventory_of_product(inventory_item_id: int, stock: int):
 
 if False:
     init()
+    print("products count: " + str(get_products_count().content))
     dropshipping_collection_id = get_collection_dropshipping_id()
     response = get_products_of_dropshipping(dropshipping_collection_id)
     parsed_products = parse_response(response.content)
-    print(len(parsed_products["products"]))
 
-    print(len(parse_response(get_products_of_dropshipping(
-        dropshipping_collection_id, response).content)["products"]))
+    delete_product(parsed_products["products"][0]["id"])
+    print("products count: " + str(get_products_count().content))
+    # print(len(parsed_products["products"]))
+
+    # print(len(parse_response(get_products_of_dropshipping(
+    #     dropshipping_collection_id, response).content)["products"]))
 
     # products = get_products()
     # write_to_file("response/shopify.json", products)
