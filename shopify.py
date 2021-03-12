@@ -15,14 +15,11 @@ def init():
     shopify = config["shopify"]
 
 
-def do_get_request(req_url, is_relative_path=True):
+def do_get_request(req_url):
     headers = {
         "X-Shopify-Access-Token": shopify["key"]
     }
-    if is_relative_path:
-        return requests.get(shopify["url"] + req_url, headers=headers)
-    else:
-        return requests.get(req_url, headers=headers)
+    return requests.get(shopify["url"] + req_url, headers=headers)
 
 
 def do_post_request(req_url, data):
@@ -59,13 +56,11 @@ def get_products_of_dropshipping(collection_id, previous_response=None):
     # are further products available we get the property link in the response,
     # which contains the next url to get the next products
     # read more here: https://shopify.dev/tutorials/make-paginated-requests-to-rest-admin-api
-    is_relative = True
     if previous_response:
         req_url = previous_response.links["next"]["url"]
-        is_relative = False
     else:
         req_url = f"/admin/api/2021-01/collections/{collection_id}/products.json"
-    response = do_get_request(req_url, is_relative_path=is_relative)
+    response = do_get_request(req_url)
     return response
 
 
@@ -83,11 +78,7 @@ def add_product(item: DropshippingItem):
             "vendor": item.brand_name,
             "body_html": attributes_to_html(item.attributes),
             "product_type": item.get_gender(),
-            "metafields": [
-                {
-                    ''
-                }
-            ],
+            "tags": item.id_product,
             "images": [
                 {
                     "attachment": item.image_base64
@@ -180,7 +171,10 @@ if False:
     response = get_products_of_dropshipping(dropshipping_collection_id)
     parsed_products = parse_response(response.content)
 
-    delete_product(parsed_products["products"][0]["id"])
+    print(parsed_products)
+
+    # for item in parsed_products["products"]:
+    #     delete_product(item["id"])
     print("products count: " + str(get_products_count().content))
     # print(len(parsed_products["products"]))
 
