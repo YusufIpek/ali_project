@@ -6,9 +6,13 @@ def parse_response(content):
     return json.loads(content)
 
 
-def write_to_file(filename, content):
-    with open(filename, "wb") as f:
-        f.write(content)
+def write_to_file(filename, content, as_byte=True):
+    if as_byte:
+        with open('response/' + filename, "wb") as f:
+            f.write(content)
+    else:
+        with open('response/' + filename, "w") as f:
+            f.write(json.dumps(content))
 
 
 def write_multiple_files(items):

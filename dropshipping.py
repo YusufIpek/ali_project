@@ -59,15 +59,15 @@ def get_brands_items(id_brand):
 
 
 def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True):
-    print("brands items to list:")
-
-    items = []
+    size = limit if limit > -1 else len(all_brands)
+    print(f"get watches from {size} brands...")
 
     if limit is not -1 and limit > 0:
-        all_brands = all_brands[:limit]
+        all_brands = all_brands[:size]
 
+    items = []
     for index, brand in enumerate(all_brands):
-        print(str(index) + "/" + str(len(all_brands)))
+        print(f"processing {index+1}/{len(all_brands)}")
         response = get_brands_items(brand["id_brand"])
         parsed_response = parse_response(response)
         if parsed_response["num_rows"] > 0:
@@ -80,6 +80,8 @@ def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True):
 
     if not keep_empty_attributes:
         mapped = list(filter(lambda x: x.attributes_available(), mapped))
+
+    print(f"{len(mapped)} products retrieved from {size} brands")
     return mapped
 
 

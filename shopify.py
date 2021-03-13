@@ -78,7 +78,7 @@ def add_product(item: DropshippingItem):
             "vendor": item.brand_name,
             "body_html": attributes_to_html(item.attributes),
             "product_type": item.get_gender(),
-            "tags": item.id_product,
+            "tags": [item.id_product, 'dropshipping'],
             "images": [
                 {
                     "attachment": item.image_base64
@@ -120,6 +120,12 @@ def get_products_count():
 
 def get_all_collections():
     req_url = "/admin/api/2021-01/custom_collections.json"
+    response = do_get_request(req_url)
+    return response
+
+
+def get_variants_of_product(product_id):
+    req_url = f"/admin/api/2021-01/products/{product_id}/variants.json"
     response = do_get_request(req_url)
     return response
 
@@ -173,8 +179,8 @@ if False:
 
     print(parsed_products)
 
-    # for item in parsed_products["products"]:
-    #     delete_product(item["id"])
+    for item in parsed_products["products"]:
+        delete_product(item["id"])
     print("products count: " + str(get_products_count().content))
     # print(len(parsed_products["products"]))
 
