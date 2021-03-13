@@ -126,27 +126,3 @@ add_product_if_not_present(dropshipping_products, shopify_products)
 update_quantity_if_differ(dropshipping_products, shopify_products)
 delete_product_if_not_available_on_dropshipping(
     dropshipping_products, shopify_products)
-
-# get detailed product info | not required because we get from the above request also the product info
-# all_items_info = ds.product_items_to_list(all_items)
-# print("Amount of products to add:" + str(len(all_items)))
-
-# for index, item in enumerate(all_items):
-#     print("processing: " + str(index+1) + "/" + str(len(all_items)))
-#     response = shopify.add_product(item)
-#     write_to_file("response/shopify_response_" +
-#                   str(index) + ".json", response.content)
-
-#     # set price of product
-#     response = parse_response(response.content)
-#     variants = response["product"]["variants"]
-#     update = shopify.set_price_of_product(variants[0]["id"], item.price)
-
-#     # set quantity of product
-#     inventory_item_id = variants[0]["inventory_item_id"]
-#     inventory_response = shopify.set_inventory_of_product(
-#         inventory_item_id, item.stock)
-
-#     # add product to collection ("dropshipping" category)
-#     added_to_collection = shopify.add_product_to_collect(
-#         response["product"]["id"])
