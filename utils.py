@@ -1,5 +1,11 @@
 import json
 import base64
+from json.encoder import JSONEncoder
+
+
+class ItemEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
 
 
 def parse_response(content):
@@ -11,8 +17,14 @@ def write_to_file(filename, content, as_byte=True):
         with open('response/' + filename, "wb") as f:
             f.write(content)
     else:
-        with open('response/' + filename, "w") as f:
-            f.write(json.dumps(content))
+        if isinstance(content, dict):
+            with open('response/' + filename, "w") as f:
+                f.write(json.dumps(content))
+        else:
+            # output = {}
+            # output['products'] = content
+            with open('response/' + filename, "w") as f:
+                f.write(json.dumps(content, cls=ItemEncoder))
 
 
 def write_multiple_files(items):

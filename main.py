@@ -3,6 +3,7 @@ from typing import List
 from utils import parse_response, write_multiple_files, write_to_file
 import dropshipping
 import shopify
+import re
 
 # load credentials
 dropshipping.init()
@@ -44,12 +45,28 @@ def get_all_watches_from_shopify(persist):
     return result
 
 
-def check_quantity_match(dropshipping_products: List[DropshippingItem], shopify_products):
+def update_quantity_if_differ(dropshipping_products: List[DropshippingItem], shopify_products):
+    print("checking for product quantity difference...")
+    count = 0
+
     for shopify_item in shopify_products:
         dropshipping_product_id = shopify_item['tags']
-        result = list(filter(lambda x: x.id_product ==
+        result = list(filter(lambda x: x.id_product in
                              dropshipping_product_id, dropshipping_products))
-        print(result)
+        if len(result) > 0:
+            shopify_quantity = shopify_item['variants'][0]['inventory_quantity']
+            dropshipping_quantity = int(result[0].stock)
+            if shopify_quantity is not dropshipping_quantity:
+                print(
+                    f"updating product quantity of {shopify_item['title']} from {shopify_quantity} to {dropshipping_quantity}")
+                # update quantity of product on shopify
+                inventory_item_id = shopify_item['variants'][0]["inventory_item_id"]
+                shopify.set_inventory_of_product(
+                    inventory_item_id, result[0].stock)
+
+                count += 1
+
+    print(f"quantity of {count} products updated")
 
 
 def add_product_if_not_present(dropshipping_products: List[DropshippingItem], shopify_products):
@@ -82,10 +99,33 @@ def add_product_if_not_present(dropshipping_products: List[DropshippingItem], sh
     print(f"{counter} products added")
 
 
+def delete_product_if_not_available_on_dropshipping(dropshipping_products: List[DropshippingItem], shopify_products):
+    print("checking if product should be removed from shopify...")
+    count = 0
+
+    for shopify_item in shopify_products:
+        dropshipping_product_id = re.findall(
+            r'\d+', shopify_item['tags'])[0]
+        result = list(filter(lambda x: x.id_product ==
+                             dropshipping_product_id, dropshipping_products))
+        if len(result) == 0:
+            print(f"deleting {shopify_item['title']}")
+            shopify.delete_product(shopify_item['id'])
+            count += 1
+
+    print(f"{count} products were deleted")
+
+
 shopify_products = get_all_watches_from_shopify(False)
 dropshipping_products = get_all_products_from_dropshipping(False)
 
+write_to_file('shopify_products.json', shopify_products, False)
+write_to_file('dropshipping_products.json', dropshipping_products, False)
+
 add_product_if_not_present(dropshipping_products, shopify_products)
+update_quantity_if_differ(dropshipping_products, shopify_products)
+delete_product_if_not_available_on_dropshipping(
+    dropshipping_products, shopify_products)
 
 # get detailed product info | not required because we get from the above request also the product info
 # all_items_info = ds.product_items_to_list(all_items)
