@@ -19,7 +19,7 @@ def get_all_products_from_dropshipping(persist=False):
         dropshipping.parse_response(all_brands)["rows"])
 
     # get all items of watches
-    all_items = dropshipping.brands_items_to_list(filtered_brands, 3, False)
+    all_items = dropshipping.brands_items_to_list(filtered_brands, 6, False)
 
     if persist:
         write_to_file('dropshipping_products.json', all_items, False)
@@ -50,8 +50,9 @@ def update_quantity_if_differ(dropshipping_products: List[DropshippingItem], sho
     count = 0
 
     for shopify_item in shopify_products:
-        dropshipping_product_id = shopify_item['tags']
-        result = list(filter(lambda x: x.id_product in
+        dropshipping_product_id = re.findall(
+            r'\d+', shopify_item['tags'])[0]
+        result = list(filter(lambda x: x.id_product ==
                              dropshipping_product_id, dropshipping_products))
         if len(result) > 0:
             shopify_quantity = shopify_item['variants'][0]['inventory_quantity']
@@ -74,8 +75,11 @@ def add_product_if_not_present(dropshipping_products: List[DropshippingItem], sh
     counter = 0
     for dropshipping_item in dropshipping_products:
         result = list(
-            filter(lambda x: dropshipping_item.id_product in x['tags'], shopify_products))
+            filter(lambda x: dropshipping_item.id_product == re.findall(
+                r'\d+', x['tags'])[0], shopify_products))
         if len(result) == 0:
+            print(f'adding {dropshipping_item.name} to shopify')
+
             # add product to shopify
             response = shopify.add_product(dropshipping_item)
             response = parse_response(response.content)
