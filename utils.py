@@ -1,3 +1,4 @@
+from dropshipping_item import DropshippingItem
 import json
 import base64
 from json.encoder import JSONEncoder
@@ -5,6 +6,8 @@ from json.encoder import JSONEncoder
 
 class ItemEncoder(JSONEncoder):
     def default(self, o):
+        if isinstance(o, DropshippingItem):
+            delattr(o, 'image_base64')
         return o.__dict__
 
 
@@ -21,8 +24,6 @@ def write_to_file(filename, content, as_byte=True):
             with open('response/' + filename, "w") as f:
                 f.write(json.dumps(content))
         else:
-            # output = {}
-            # output['products'] = content
             with open('response/' + filename, "w") as f:
                 f.write(json.dumps(content, cls=ItemEncoder))
 

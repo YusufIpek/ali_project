@@ -10,7 +10,8 @@ class DropshippingItem:
         self.weight = data["weight"]
         self.retail_price = data["retail_price"]
         self.discount = data["discount"]
-        self.price = data["price"]
+        self.price = data["retail_price"] if data["retail_price"] is not data["price"] else str(
+            int(data["retail_price"]) * 1.3)
         self.id_supplier = data["id_supplier"]
         self.speed_shipping = data["speed_shipping"]
         self.ean = data["ean"]
@@ -25,6 +26,16 @@ class DropshippingItem:
         return len(self.attributes) > 0
 
     def get_gender(self):
+        mapping = {
+            "mann": "Herren",
+            "frau": "Damen",
+            "unisex": "Damen & Herren",
+            "kind": "Kind"
+        }
         found = list(
             filter(lambda x: x["group_name"].lower() == 'geschlecht', self.attributes))
-        return found[0]["value_name"] if len(found) == 1 else None
+
+        if len(found) > 0:
+            return mapping[found[0].lower()]
+        else:
+            return None

@@ -1,5 +1,5 @@
 from dropshipping_item import DropshippingItem
-from dropshipping_filter import drop_specific_brands, get_specific_brands, get_watches
+from dropshipping_filter import drop_specific_brands, get_watches_and_jewelry, keep_only_adult_products
 from utils import *
 import requests
 import json
@@ -60,7 +60,7 @@ def get_brands_items(id_brand):
 
 def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True):
     size = limit if limit > -1 else len(all_brands)
-    print(f"get watches from {size} brands...")
+    print(f"get watches and jewelry from {size} brands...")
 
     if limit is not -1 and limit > 0:
         all_brands = all_brands[:size]
