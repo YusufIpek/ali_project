@@ -20,7 +20,7 @@ def get_all_products_from_dropshipping(persist=False):
 
     # get all items of watches
     all_items = dropshipping.brands_items_to_list(
-        filtered_brands, limit=20, keep_empty_attributes=True)
+        filtered_brands, limit=3, keep_empty_attributes=True)
 
     # remove children products
     all_items = dropshipping.keep_only_adult_products(all_items)
@@ -130,7 +130,7 @@ dropshipping_products = get_all_products_from_dropshipping(False)
 write_to_file('shopify_products.json', shopify_products, False)
 write_to_file('dropshipping_products.json', dropshipping_products, False)
 
-# add_product_if_not_present(dropshipping_products, shopify_products)
-# update_quantity_if_differ(dropshipping_products, shopify_products)
-# delete_product_if_not_available_on_dropshipping(
-#     dropshipping_products, shopify_products)
+add_product_if_not_present(dropshipping_products, shopify_products)
+update_quantity_if_differ(dropshipping_products, shopify_products)
+delete_product_if_not_available_on_dropshipping(
+    dropshipping_products, shopify_products)

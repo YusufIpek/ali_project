@@ -2,13 +2,15 @@ from dropshipping_item import DropshippingItem
 import json
 import base64
 from json.encoder import JSONEncoder
+import copy
 
 
 class ItemEncoder(JSONEncoder):
     def default(self, o):
         if isinstance(o, DropshippingItem):
-            delattr(o, 'image_base64')
-        return o.__dict__
+            tmp = copy.deepcopy(o)
+            delattr(tmp, 'image_base64')
+        return tmp.__dict__
 
 
 def parse_response(content):
