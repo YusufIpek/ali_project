@@ -43,9 +43,9 @@ def image_byte_to_base64(image):
 def attributes_to_html(attributes):
     html = "<h2 class=\"spr-header-title\">Produktdetails</h2>"
     html += "<div class=\"row\">"
-    for item in attributes:
-        html += f"<div class=\"col-6\">{ item['group_name'] }</div>"
-        html += f"<div class=\"col-6\">{ item['value_name'] }</div>"
+    for index, item in enumerate(attributes):
+        html += f"<div class=\"col-6 {'bg-light' if index%2 == 0 else ''}\">{item['group_name']}</div>"
+        html += f"<div class=\"col-6 {'bg-light' if index%2 == 0 else ''}\">{ item['value_name'] }</div>"
         html += "<div class=\"w-100\"></div>"
     html += "</div>"
     return html

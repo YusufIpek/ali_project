@@ -170,7 +170,7 @@ def set_inventory_of_product(inventory_item_id: int, stock: int):
     return response
 
 
-if False:
+if __name__ == '__main__':
     init()
     print("products count: " + str(get_products_count().content))
     dropshipping_collection_id = get_collection_dropshipping_id()

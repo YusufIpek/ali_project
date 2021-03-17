@@ -4,10 +4,7 @@ from utils import parse_response, write_multiple_files, write_to_file
 import dropshipping
 import shopify
 import re
-
-# load credentials
-dropshipping.init()
-shopify.init()
+from log_handler import *
 
 
 def get_all_products_from_dropshipping(persist=False):
@@ -20,7 +17,7 @@ def get_all_products_from_dropshipping(persist=False):
 
     # get all items of watches
     all_items = dropshipping.brands_items_to_list(
-        filtered_brands, limit=3, keep_empty_attributes=True)
+        filtered_brands, limit=10, keep_empty_attributes=True)
 
     # remove children products
     all_items = dropshipping.keep_only_adult_products(all_items)
@@ -50,7 +47,7 @@ def get_all_watches_from_shopify(persist):
 
 
 def update_quantity_if_differ(dropshipping_products: List[DropshippingItem], shopify_products):
-    print("checking for product quantity difference...")
+    logger.info("checking for product quantity difference...")
     count = 0
 
     for shopify_item in shopify_products:
@@ -62,7 +59,7 @@ def update_quantity_if_differ(dropshipping_products: List[DropshippingItem], sho
             shopify_quantity = shopify_item['variants'][0]['inventory_quantity']
             dropshipping_quantity = int(result[0].stock)
             if shopify_quantity is not dropshipping_quantity:
-                print(
+                logger.info(
                     f"updating product quantity of {shopify_item['title']} from {shopify_quantity} to {dropshipping_quantity}")
                 # update quantity of product on shopify
                 inventory_item_id = shopify_item['variants'][0]["inventory_item_id"]
@@ -71,18 +68,18 @@ def update_quantity_if_differ(dropshipping_products: List[DropshippingItem], sho
 
                 count += 1
 
-    print(f"quantity of {count} products updated")
+    logger.info(f"quantity of {count} products updated")
 
 
 def add_product_if_not_present(dropshipping_products: List[DropshippingItem], shopify_products):
-    print('adding products to shopify...')
+    logger.info('adding products to shopify...')
     counter = 0
     for dropshipping_item in dropshipping_products:
         result = list(
             filter(lambda x: dropshipping_item.id_product == re.findall(
                 r'\d+', x['tags'])[0], shopify_products))
         if len(result) == 0:
-            print(f'adding {dropshipping_item.name} to shopify')
+            logger.info(f'adding {dropshipping_item.name} to shopify')
 
             # add product to shopify
             response = shopify.add_product(dropshipping_item)
@@ -104,11 +101,11 @@ def add_product_if_not_present(dropshipping_products: List[DropshippingItem], sh
 
             counter += 1
 
-    print(f"{counter} products added")
+    logger.info(f"{counter} products added")
 
 
 def delete_product_if_not_available_on_dropshipping(dropshipping_products: List[DropshippingItem], shopify_products):
-    print("checking if product should be removed from shopify...")
+    logger.info("checking if product should be removed from shopify...")
     count = 0
 
     for shopify_item in shopify_products:
@@ -117,20 +114,29 @@ def delete_product_if_not_available_on_dropshipping(dropshipping_products: List[
         result = list(filter(lambda x: x.id_product ==
                              dropshipping_product_id, dropshipping_products))
         if len(result) == 0:
-            print(f"deleting {shopify_item['title']}")
+            logger.info(f"deleting {shopify_item['title']}")
             shopify.delete_product(shopify_item['id'])
             count += 1
 
-    print(f"{count} products were deleted")
+    logger.info(f"{count} products were deleted")
 
 
-shopify_products = get_all_watches_from_shopify(False)
-dropshipping_products = get_all_products_from_dropshipping(False)
+if __name__ == '__main__':
+    try:
+        # load credentials
+        dropshipping.init()
+        shopify.init()
 
-write_to_file('shopify_products.json', shopify_products, False)
-write_to_file('dropshipping_products.json', dropshipping_products, False)
+        shopify_products = get_all_watches_from_shopify(False)
+        dropshipping_products = get_all_products_from_dropshipping(False)
 
-add_product_if_not_present(dropshipping_products, shopify_products)
-update_quantity_if_differ(dropshipping_products, shopify_products)
-delete_product_if_not_available_on_dropshipping(
-    dropshipping_products, shopify_products)
+        write_to_file('shopify_products.json', shopify_products, False)
+        write_to_file('dropshipping_products.json',
+                      dropshipping_products, False)
+
+        add_product_if_not_present(dropshipping_products, shopify_products)
+        update_quantity_if_differ(dropshipping_products, shopify_products)
+        delete_product_if_not_available_on_dropshipping(
+            dropshipping_products, shopify_products)
+    except:
+        logger.exception('Exception occured')

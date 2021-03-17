@@ -121,7 +121,7 @@ def get_item_image(url):
     return image_byte_to_base64(response.content).decode('utf-8')
 
 
-if False:
+if __name__ == '__main__':
     # read config data and initialize api and user object
     init()
 
@@ -130,7 +130,8 @@ if False:
     write_to_file("response/brands.json", all_brands)
 
     # filter get only watches
-    filtered_categories = get_watches(parse_response(all_brands)["rows"])
+    filtered_categories = get_watches_and_jewelry(
+        parse_response(all_brands)["rows"])
     filtered_categories_in_byte = json.dumps(
         filtered_categories).encode('utf-8')
     write_to_file("response/filtered_categories.json",

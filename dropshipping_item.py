@@ -36,6 +36,6 @@ class DropshippingItem:
             filter(lambda x: x["group_name"].lower() == 'geschlecht', self.attributes))
 
         if len(found) > 0:
-            return mapping[found[0].lower()]
+            return mapping[found[0]["value_name"].lower()]
         else:
             return None

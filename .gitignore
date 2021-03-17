@@ -1,3 +1,4 @@
 config.json
 response/*
 __pycache__/*
+logs.log
