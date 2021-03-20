@@ -3,6 +3,8 @@ from dropshipping_filter import drop_specific_brands, get_watches_and_jewelry, k
 from utils import *
 import requests
 import json
+from log_handler import *
+
 
 requests.packages.urllib3.disable_warnings()
 
@@ -60,29 +62,35 @@ def get_brands_items(id_brand):
 
 def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True):
     size = limit if limit > -1 else len(all_brands)
-    print(f"get watches and jewelry from {size} brands...")
+    logger.info(f"get watches and jewelry from {size} brands...")
 
     if limit is not -1 and limit > 0:
         all_brands = all_brands[:size]
 
     items = []
     for index, brand in enumerate(all_brands):
-        print(f"processing {index+1}/{len(all_brands)}")
+        logger.info(f"processing {index+1}/{len(all_brands)}")
         response = get_brands_items(brand["id_brand"])
         parsed_response = parse_response(response)
         if parsed_response["num_rows"] > 0:
-            items.extend(parsed_response["rows"])
+            items.append((brand, parsed_response["rows"]))
 
-    filtered = list(filter(lambda x: "icon_path" in x, items))
-    mapped = list(map(lambda x: DropshippingItem(x), filtered))
-    for item in mapped:
-        item.image_base64 = get_item_image(item.image_path)
+    filtered = []
+    for item in items:
+        tmp = list(filter(lambda x: "icon_path" in x, item[1]))
+        tmp = list(map(lambda x: DropshippingItem(x, item[0]), tmp))
+        for d_item in tmp:
+            d_item.image_base64 = get_item_image(d_item.image_path)
+        filtered.extend(tmp)
 
+    products_with_attributes = []
     if not keep_empty_attributes:
-        mapped = list(filter(lambda x: x.attributes_available(), mapped))
+        products_with_attributes = list(
+            filter(lambda x: x.attributes_available(), filtered))
 
-    print(f"{len(mapped)} products retrieved from {size} brands")
-    return mapped
+    logger.info(
+        f"{len(filtered if keep_empty_attributes else products_with_attributes)} products retrieved from {size} brands")
+    return filtered if keep_empty_attributes else products_with_attributes
 
 
 def get_item(id_product):
@@ -92,11 +100,11 @@ def get_item(id_product):
 
 
 def product_items_to_list(brands_items, keep_empty_attributes=True):
-    print("product items to list:")
+    logger.info("product items to list:")
 
     items = []
     for index, item in enumerate(brands_items):
-        print(str(index) + "/" + str(len(brands_items)))
+        logger.info(str(index) + "/" + str(len(brands_items)))
         response = parse_response(get_item(item["id_product"]))
         if response["num_rows"] > 0:
             if "image_path" in response["rows"][0]:
@@ -107,9 +115,8 @@ def product_items_to_list(brands_items, keep_empty_attributes=True):
             try:
                 item.image_base64 = get_item_image(item.image_path)
             except Exception as e:
-                print("image couldn't be created for" + item.name)
-                print(item)
-                print(e)
+                logger.exception("image couldn't be created for" + item.name)
+                logger.info(item)
 
             if keep_empty_attributes or item.attributes_available():
                 items.append(item)

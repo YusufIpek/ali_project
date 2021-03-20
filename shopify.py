@@ -2,6 +2,7 @@ from dropshipping_item import DropshippingItem
 import json
 import requests
 from utils import *
+from log_handler import *
 
 # group all products in the collection
 collection = 237585006758
@@ -15,11 +16,14 @@ def init():
     shopify = config["shopify"]
 
 
-def do_get_request(req_url):
+def do_get_request(req_url, append_root_url=True):
     headers = {
         "X-Shopify-Access-Token": shopify["key"]
     }
-    return requests.get(shopify["url"] + req_url, headers=headers)
+    if append_root_url:
+        return requests.get(shopify["url"] + req_url, headers=headers)
+    else:
+        return requests.get(req_url, headers=headers)
 
 
 def do_post_request(req_url, data):
@@ -46,22 +50,32 @@ def do_put_request(req_url, data):
 
 
 def get_products():
-    req_url = "admin/api/2021-01/products.json"
+    req_url = "admin/api/2021-01/products.json?limit=250"
+    result = []
     response = do_get_request(req_url)
-    return response.content
+    result.extend(parse_response(response.content)["products"])
+    while "next" in response.links:
+        response = do_get_request(
+            response.links["next"]["url"], append_root_url=False)
+        result.extend(parse_response(response.content)["products"])
+
+    return result
 
 
-def get_products_of_dropshipping(collection_id, previous_response=None):
+def get_products_of_dropshipping(collection_id):
     # this request uses pagination, max limit is 250, default is 50, if there
     # are further products available we get the property link in the response,
     # which contains the next url to get the next products
     # read more here: https://shopify.dev/tutorials/make-paginated-requests-to-rest-admin-api
-    if previous_response:
-        req_url = previous_response.links["next"]["url"]
-    else:
-        req_url = f"/admin/api/2021-01/collections/{collection_id}/products.json"
+    req_url = f"/admin/api/2021-01/collections/{collection_id}/products.json?limit=250"
+    result = []
     response = do_get_request(req_url)
-    return response
+    result.extend(parse_response(response.content)["products"])
+    while "next" in response.links:
+        response = do_get_request(
+            response.links["next"]["url"], append_root_url=False)
+        result.extend(parse_response(response.content)["products"])
+    return result
 
 
 def get_location():
@@ -77,7 +91,7 @@ def add_product(item: DropshippingItem):
             "title": item.name,
             "vendor": item.brand_name,
             "body_html": attributes_to_html(item.attributes),
-            "product_type": item.get_gender(),
+            "product_type": item.get_product_type(),
             "tags": [item.id_product, 'dropshipping'],
             "images": [
                 {
@@ -172,19 +186,16 @@ def set_inventory_of_product(inventory_item_id: int, stock: int):
 
 if __name__ == '__main__':
     init()
-    print("products count: " + str(get_products_count().content))
+    logger.info("products count: " + str(get_products_count().content))
     dropshipping_collection_id = get_collection_dropshipping_id()
-    response = get_products_of_dropshipping(dropshipping_collection_id)
-    parsed_products = parse_response(response.content)
+    parsed_products = get_products_of_dropshipping(dropshipping_collection_id)
 
-    print(parsed_products)
-
-    for item in parsed_products["products"]:
+    for item in parsed_products:
         delete_product(item["id"])
-    print("products count: " + str(get_products_count().content))
-    # print(len(parsed_products["products"]))
+    logger.info("products count: " + str(get_products_count().content))
+    # logger.info(len(parsed_products["products"]))
 
-    # print(len(parse_response(get_products_of_dropshipping(
+    # logger.info(len(parse_response(get_products_of_dropshipping(
     #     dropshipping_collection_id, response).content)["products"]))
 
     # products = get_products()

@@ -1,10 +1,11 @@
 from dropshipping_item import DropshippingItem
 from typing import List
-from utils import parse_response, write_multiple_files, write_to_file
+from utils import get_timestamp, parse_response, get_date, write_to_file
 import dropshipping
 import shopify
 import re
 from log_handler import *
+import cProfile
 
 
 def get_all_products_from_dropshipping(persist=False):
@@ -17,7 +18,7 @@ def get_all_products_from_dropshipping(persist=False):
 
     # get all items of watches
     all_items = dropshipping.brands_items_to_list(
-        filtered_brands, limit=10, keep_empty_attributes=True)
+        filtered_brands, limit=4, keep_empty_attributes=True)
 
     # remove children products
     all_items = dropshipping.keep_only_adult_products(all_items)
@@ -35,9 +36,7 @@ def get_all_watches_from_shopify(persist):
     # watches_from_shopify = parse_response(response.content)
 
     response = shopify.get_products()
-    response = parse_response(response)
-    result = list(
-        filter(lambda x: 'dropshipping' in x['tags'], response['products']))
+    result = list(filter(lambda x: 'dropshipping' in x['tags'], response))
 
     if persist:
         write_to_file('shopify_dropshipping_products.json',
@@ -121,7 +120,7 @@ def delete_product_if_not_available_on_dropshipping(dropshipping_products: List[
     logger.info(f"{count} products were deleted")
 
 
-if __name__ == '__main__':
+def main():
     try:
         # load credentials
         dropshipping.init()
@@ -140,3 +139,9 @@ if __name__ == '__main__':
             dropshipping_products, shopify_products)
     except:
         logger.exception('Exception occured')
+
+
+if __name__ == '__main__':
+    utils.create_folder_if_not_exist('profiling')
+    cProfile.run('main()', 'profiling/profiling_stats-' +
+                 get_timestamp() + '.stat')

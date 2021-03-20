@@ -3,6 +3,8 @@ import json
 import base64
 from json.encoder import JSONEncoder
 import copy
+from datetime import date, datetime
+import os
 
 
 class ItemEncoder(JSONEncoder):
@@ -49,3 +51,16 @@ def attributes_to_html(attributes):
         html += "<div class=\"w-100\"></div>"
     html += "</div>"
     return html
+
+
+def get_date():
+    return str(date.today())
+
+
+def get_timestamp():
+    return str(datetime.now()).replace(":", "-")
+
+
+def create_folder_if_not_exist(folder_name):
+    if not os.path.exists(folder_name):
+        os.mkdir(folder_name)

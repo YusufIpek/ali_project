@@ -1,7 +1,7 @@
 
 
 class DropshippingItem:
-    def __init__(self, data):
+    def __init__(self, data, category):
         self.id_product = data["id_product"]
         self.reference = data["reference"]
         self.brand_name = data["brand_name"]
@@ -21,21 +21,22 @@ class DropshippingItem:
         self.currency = data["currency"]
         self.attributes = data["attributes_array"]
         self.image_base64 = ""
+        self.category_object = category
 
     def attributes_available(self):
         return len(self.attributes) > 0
 
-    def get_gender(self):
+    def get_product_type(self):
         mapping = {
             "mann": "Herren",
             "frau": "Damen",
-            "unisex": "Damen & Herren",
+            "unisex": "Unisex",
             "kind": "Kind"
         }
         found = list(
             filter(lambda x: x["group_name"].lower() == 'geschlecht', self.attributes))
 
         if len(found) > 0:
-            return mapping[found[0]["value_name"].lower()]
+            return mapping[found[0]["value_name"].lower()] + self.category_object["group"]
         else:
             return None
