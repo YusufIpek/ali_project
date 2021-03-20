@@ -95,7 +95,8 @@ def add_product(item: DropshippingItem):
             "tags": [item.id_product, 'dropshipping'],
             "images": [
                 {
-                    "attachment": item.image_base64
+                    # "attachment": item.image_base64
+                    "src": item.image_path  # product image will be downloaded by shopify
                 }
             ],
             "shop": {

@@ -1,5 +1,5 @@
 from dropshipping_item import DropshippingItem
-from dropshipping_filter import drop_specific_brands, get_watches_and_jewelry, keep_only_adult_products
+import dropshipping_filter
 from utils import *
 import requests
 import json
@@ -60,7 +60,7 @@ def get_brands_items(id_brand):
     return make_request(payload)
 
 
-def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True):
+def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True, generate_base64_image=True):
     size = limit if limit > -1 else len(all_brands)
     logger.info(f"get watches and jewelry from {size} brands...")
 
@@ -79,8 +79,9 @@ def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True):
     for item in items:
         tmp = list(filter(lambda x: "icon_path" in x, item[1]))
         tmp = list(map(lambda x: DropshippingItem(x, item[0]), tmp))
-        for d_item in tmp:
-            d_item.image_base64 = get_item_image(d_item.image_path)
+        if generate_base64_image:
+            for d_item in tmp:
+                d_item.image_base64 = get_item_image(d_item.image_path)
         filtered.extend(tmp)
 
     products_with_attributes = []
@@ -137,14 +138,14 @@ if __name__ == '__main__':
     write_to_file("response/brands.json", all_brands)
 
     # filter get only watches
-    filtered_categories = get_watches_and_jewelry(
+    filtered_categories = dropshipping_filter.get_watches_and_jewelry(
         parse_response(all_brands)["rows"])
     filtered_categories_in_byte = json.dumps(
         filtered_categories).encode('utf-8')
     write_to_file("response/filtered_categories.json",
                   filtered_categories_in_byte)
 
-    filtered_brands = drop_specific_brands(
+    filtered_brands = dropshipping_filter.drop_specific_brands(
         filtered_categories, "disney")
     filtered_brands_in_byte = json.dumps(filtered_brands).encode('utf-8')
     write_to_file("response/filtered_brands.json", filtered_brands_in_byte)

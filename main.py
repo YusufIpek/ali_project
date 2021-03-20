@@ -1,6 +1,7 @@
 from dropshipping_item import DropshippingItem
 from typing import List
-from utils import get_timestamp, parse_response, get_date, write_to_file
+from utils import get_timestamp, parse_response, write_to_file
+import dropshipping_filter
 import dropshipping
 import shopify
 import re
@@ -13,15 +14,18 @@ def get_all_products_from_dropshipping(persist=False):
     all_brands = dropshipping.get_brands()
 
     # filter get only watches
-    filtered_brands = dropshipping.get_watches_and_jewelry(
+    filtered_brands = dropshipping_filter.get_watches_and_jewelry(
         dropshipping.parse_response(all_brands)["rows"])
+
+    filtered_brands = dropshipping_filter.keep_only_specific_brands(
+        filtered_brands)
 
     # get all items of watches
     all_items = dropshipping.brands_items_to_list(
-        filtered_brands, limit=4, keep_empty_attributes=True)
+        filtered_brands, limit=-1, keep_empty_attributes=True, generate_base64_image=False)
 
     # remove children products
-    all_items = dropshipping.keep_only_adult_products(all_items)
+    # all_items = dropshipping.keep_only_adult_products(all_items)
 
     if persist:
         write_to_file('dropshipping_products.json', all_items, False)

@@ -37,6 +37,6 @@ class DropshippingItem:
             filter(lambda x: x["group_name"].lower() == 'geschlecht', self.attributes))
 
         if len(found) > 0:
-            return mapping[found[0]["value_name"].lower()] + self.category_object["group"]
+            return mapping[found[0]["value_name"].lower()] + self.category_object["group"].strip()
         else:
-            return None
+            return "Unbekannt" + self.category_object["group"].strip()

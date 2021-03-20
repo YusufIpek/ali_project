@@ -64,3 +64,12 @@ def get_timestamp():
 def create_folder_if_not_exist(folder_name):
     if not os.path.exists(folder_name):
         os.mkdir(folder_name)
+
+
+def brand_equal_check_special_solution(input, collection):
+    tmp = input.split(" ")
+    for t in tmp:
+        for c in collection:
+            if t == c:
+                return True
+    return False

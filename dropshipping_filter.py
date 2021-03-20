@@ -1,5 +1,6 @@
 from typing import List
 from dropshipping_item import DropshippingItem
+import utils
 
 
 def get_watches_and_jewelry(data):
@@ -22,6 +23,16 @@ def keep_only_adult_products(data: List[DropshippingItem]):
 def get_specific_brands(data, *args):
     args = list(map(lambda x: x.lower(), args))
     return list(filter(lambda x: x["name"].lower() in args, data))
+
+
+def keep_only_specific_brands(data):
+    uhren = ['armani exchange', 'bmw', 'diesel', 'emporio armani', 'fossil', 'guess', 'michael kors',
+             'tommy hilfinger', 'pierre cardin', 'citizen', 'calvin klein']
+    schmuck = ['amen', 'emporio armani', 'esprit', 'fossil', 'guess', 'pierre cardin', 'michael kors',
+               'swarovski', 'tommy hilfiger']
+
+    return list(filter(lambda x: x["group"].lower().strip() == 'uhren' and utils.brand_equal_check_special_solution(x["name"].lower().strip(), uhren)
+                       or x["group"].lower().strip() == 'schmuck' and utils.brand_equal_check_special_solution(x["name"].lower().strip(), schmuck), data))
 
 
 def drop_specific_brands(data, *args):
