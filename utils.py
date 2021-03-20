@@ -67,6 +67,9 @@ def create_folder_if_not_exist(folder_name):
 
 
 def brand_equal_check_special_solution(input, collection):
+    if input in collection:
+        return True
+
     tmp = input.split(" ")
     for t in tmp:
         for c in collection:
