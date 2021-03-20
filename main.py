@@ -146,6 +146,8 @@ def main():
 
 
 if __name__ == '__main__':
-    utils.create_folder_if_not_exist('profiling')
-    cProfile.run('main()', 'profiling/profiling_stats-' +
-                 get_timestamp() + '.stat')
+    main()
+    # uncomment below code to execute profiling
+    # utils.create_folder_if_not_exist('profiling')
+    # cProfile.run('main()', 'profiling/profiling_stats-' +
+    #              get_timestamp() + '.stat')
