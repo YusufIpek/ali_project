@@ -91,7 +91,7 @@ def add_product_if_not_present(dropshipping_products: List[DropshippingItem], sh
             # set price of product
             variants = response["product"]["variants"]
             shopify.set_price_of_product(
-                variants[0]["id"], dropshipping_item.price)
+                variants[0]["id"], dropshipping_item.get_selling_price())
 
             # set quantity of product
             inventory_item_id = variants[0]["inventory_item_id"]
@@ -137,7 +137,8 @@ def main():
         write_to_file('dropshipping_products.json',
                       dropshipping_products, False)
 
-        add_product_if_not_present(dropshipping_products, shopify_products)
+        add_product_if_not_present(
+            dropshipping_products, shopify_products)
         update_quantity_if_differ(dropshipping_products, shopify_products)
         delete_product_if_not_available_on_dropshipping(
             dropshipping_products, shopify_products)

@@ -192,6 +192,7 @@ if __name__ == '__main__':
     parsed_products = get_products_of_dropshipping(dropshipping_collection_id)
 
     for item in parsed_products:
+        logger.info("deleting product " + item["title"])
         delete_product(item["id"])
     logger.info("products count: " + str(get_products_count().content))
     # logger.info(len(parsed_products["products"]))

@@ -10,8 +10,7 @@ class DropshippingItem:
         self.weight = data["weight"]
         self.retail_price = data["retail_price"]
         self.discount = data["discount"]
-        self.price = data["retail_price"] if data["retail_price"] is not data["price"] else str(
-            int(data["retail_price"]) * 1.3)
+        self.price = data["price"]
         self.id_supplier = data["id_supplier"]
         self.speed_shipping = data["speed_shipping"]
         self.ean = data["ean"]
@@ -40,3 +39,14 @@ class DropshippingItem:
             return mapping[found[0]["value_name"].lower()] + self.category_object["group"].strip()
         else:
             return "Unbekannt" + self.category_object["group"].strip()
+
+    def get_selling_price(self):
+        discount = float(self.discount)
+        if discount >= 65:
+            return float(self.price) * 1.85
+        elif discount >= 55:
+            return float(self.price) * 1.80
+        elif discount >= 40:
+            return float(self.price) * 1.60
+        else:
+            return float(self.price) * 1.50
