@@ -1,5 +1,3 @@
-
-
 class DropshippingItem:
     def __init__(self, data, category):
         self.id_product = data["id_product"]
@@ -41,12 +39,21 @@ class DropshippingItem:
             return "Unbekannt" + self.category_object["group"].strip()
 
     def get_selling_price(self):
+        uhren = ["uhren", "watches"]
         discount = float(self.discount)
-        if discount >= 65:
-            return float(self.price) * 1.85
-        elif discount >= 55:
-            return float(self.price) * 1.80
-        elif discount >= 40:
-            return float(self.price) * 1.60
+
+        def myround(x): return round(x, 1)  # rounding
+
+        if self.category_object["group"].lower() in uhren:
+            if discount >= 65:
+                return myround(float(self.price) * 1.85)
+            elif discount >= 55:
+                return myround(float(self.price) * 1.80)
+            elif discount >= 40:
+                return myround(float(self.price) * 1.60)
+            else:
+                return myround(float(self.price) * 1.50)
         else:
-            return float(self.price) * 1.50
+            price = float(self.price)
+            shipping_cost = 12
+            return myround((price + shipping_cost) + (price * 0.30))

@@ -1,3 +1,4 @@
+from typing import List
 from dropshipping_item import DropshippingItem
 import json
 import base64
@@ -55,6 +56,13 @@ def attributes_to_html(attributes):
 
 def get_date():
     return str(date.today())
+
+
+def dropshipping_products_to_csv(data: List[DropshippingItem], output):
+    with open('response/' + output + '.txt', 'w+') as f:
+        for item in data:
+            f.writelines(
+                f'{item.name},{item.category_object["group"]},{item.retail_price},{item.discount},{item.price},{item.get_selling_price()}\n')
 
 
 def get_timestamp():

@@ -1,6 +1,6 @@
 from dropshipping_item import DropshippingItem
 from typing import List
-from utils import get_timestamp, parse_response, write_to_file
+from utils import dropshipping_products_to_csv, get_timestamp, parse_response, write_to_file
 import dropshipping_filter
 import dropshipping
 import shopify
@@ -16,6 +16,8 @@ def get_all_products_from_dropshipping(persist=False):
     # filter get only watches
     filtered_brands = dropshipping_filter.get_watches_and_jewelry(
         dropshipping.parse_response(all_brands)["rows"])
+
+    write_to_file('all_brands.json', filtered_brands, False)
 
     filtered_brands = dropshipping_filter.keep_only_specific_brands(
         filtered_brands)
@@ -136,6 +138,9 @@ def main():
         write_to_file('shopify_products.json', shopify_products, False)
         write_to_file('dropshipping_products.json',
                       dropshipping_products, False)
+
+        # dropshipping_products_to_csv(
+        #     dropshipping_products, 'dropshipping_produkte')
 
         add_product_if_not_present(
             dropshipping_products, shopify_products)
