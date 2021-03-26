@@ -77,7 +77,7 @@ def update_quantity_if_differ(dropshipping_products: List[DropshippingItem], sho
 
 
 def add_product_if_not_present(dropshipping_products: List[DropshippingItem], shopify_products):
-    logger.info('adding products to shopify...')
+    logger.info(f'adding products to shopify...')
     counter = 0
     for dropshipping_item in dropshipping_products:
         result = list(

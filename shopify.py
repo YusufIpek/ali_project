@@ -88,9 +88,9 @@ def add_product(item: DropshippingItem):
     req_url = "/admin/api/2021-01/products.json"
     product = {
         "product": {
-            "title": item.name,
+            "title": item.get_title(),
             "vendor": item.brand_name,
-            "body_html": attributes_to_html(item.attributes),
+            "body_html": attributes_to_html(item),
             "product_type": item.get_product_type(),
             "tags": [item.id_product, 'dropshipping'],
             "images": [

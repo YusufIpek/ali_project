@@ -38,6 +38,9 @@ class DropshippingItem:
         else:
             return "Unbekannt" + self.category_object["group"].strip()
 
+    def get_title(self):
+        return self.name + " - " + self.reference
+
     def get_selling_price(self):
         uhren = ["uhren", "watches"]
         discount = float(self.discount)
