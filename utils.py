@@ -21,6 +21,7 @@ def parse_response(content):
 
 
 def write_to_file(filename, content, as_byte=True):
+    create_folder_if_not_exist('response')
     if as_byte:
         with open('response/' + filename, "wb") as f:
             f.write(content)
@@ -34,6 +35,7 @@ def write_to_file(filename, content, as_byte=True):
 
 
 def write_multiple_files(items):
+    create_folder_if_not_exist('response')
     for item in items:
         write_to_file("response/"+item.id_product + ".json",
                       json.dumps(item.__dict__).encode('utf-8'))
