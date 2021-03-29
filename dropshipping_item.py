@@ -39,6 +39,9 @@ class DropshippingItem:
             return "Unbekannt" + self.category_object["group"].strip()
 
     def get_title(self):
+        # if self.brand_name.lower().strip() == 'guess':
+        if self.reference in self.name:
+            return self.name
         return self.name + " - " + self.reference
 
     def get_selling_price(self):
