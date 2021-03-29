@@ -29,6 +29,8 @@ def get_all_products_from_dropshipping(persist=False):
     # remove children products
     # all_items = dropshipping.keep_only_adult_products(all_items)
 
+    all_items = dropshipping_filter.keep_only_products_with_images(all_items)
+
     if persist:
         write_to_file('dropshipping_products.json', all_items, False)
 

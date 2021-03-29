@@ -20,6 +20,10 @@ def keep_only_adult_products(data: List[DropshippingItem]):
     return result
 
 
+def keep_only_products_with_images(data: List[DropshippingItem]):
+    return list(filter(lambda x: '.jpg' in x.image_path.lower() and 'noimage' not in x.image_path.lower(), data))
+
+
 def get_specific_brands(data, *args):
     args = list(map(lambda x: x.lower(), args))
     return list(filter(lambda x: x["name"].lower() in args, data))
