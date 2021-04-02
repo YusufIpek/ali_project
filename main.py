@@ -1,6 +1,6 @@
 from dropshipping_item import DropshippingItem
 from typing import List
-from utils import dropshipping_products_to_csv, get_timestamp, parse_response, write_to_file
+from utils import dropshipping_products_to_csv, get_dropshipping_id_from_shopify_product, get_timestamp, parse_response, price_comparison, write_to_file
 import dropshipping_filter
 import dropshipping
 import shopify
@@ -58,8 +58,8 @@ def update_quantity_if_differ(dropshipping_products: List[DropshippingItem], sho
     count = 0
 
     for shopify_item in shopify_products:
-        dropshipping_product_id = re.findall(
-            r'\d+', shopify_item['tags'])[0]
+        dropshipping_product_id = get_dropshipping_id_from_shopify_product(
+            shopify_item)
         result = list(filter(lambda x: x.id_product ==
                              dropshipping_product_id, dropshipping_products))
         if len(result) > 0:
@@ -78,13 +78,35 @@ def update_quantity_if_differ(dropshipping_products: List[DropshippingItem], sho
     logger.info(f"quantity of {count} products updated")
 
 
+def update_prices_of_products_if_differ(dropshippping_products: List[DropshippingItem], shopify_products):
+    logger.info('updating prices of products ...')
+    counter = 0
+    for item in shopify_products:
+        dp_item = list(filter(lambda x: x.id_product == get_dropshipping_id_from_shopify_product(
+            item), dropshippping_products))[0]
+
+        shopify_price = float(item['variants'][0]['price'])
+        dropshipping_price = dp_item.get_selling_price()
+        if dropshipping_price != shopify_price:
+            logger.info('update price of ' + item['title'] + ' from: ' + str(
+                item['variants'][0]['price']) + ' to ' + str(dropshipping_price))
+            shopify.set_price_of_product(
+                item["variants"][0]["id"], dropshipping_price)
+
+            counter += 1
+
+    logger.info(f'prices of {counter} products updated!')
+
+    # item["new_price"] = dp_item.get_selling_price() # add this if price_comparison method should be called
+    # price_comparison(shopify_products, 'price_comparison') # create file to compare price difference
+
+
 def add_product_if_not_present(dropshipping_products: List[DropshippingItem], shopify_products):
     logger.info(f'adding products to shopify...')
     counter = 0
     for dropshipping_item in dropshipping_products:
         result = list(
-            filter(lambda x: dropshipping_item.id_product == re.findall(
-                r'\d+', x['tags'])[0], shopify_products))
+            filter(lambda x: dropshipping_item.id_product == get_dropshipping_id_from_shopify_product(x), shopify_products))
         if len(result) == 0:
             logger.info(f'adding {dropshipping_item.name} to shopify')
 
@@ -116,8 +138,8 @@ def delete_product_if_not_available_on_dropshipping(dropshipping_products: List[
     count = 0
 
     for shopify_item in shopify_products:
-        dropshipping_product_id = re.findall(
-            r'\d+', shopify_item['tags'])[0]
+        dropshipping_product_id = get_dropshipping_id_from_shopify_product(
+            shopify_item)
         result = list(filter(lambda x: x.id_product ==
                              dropshipping_product_id, dropshipping_products))
         if len(result) == 0:
@@ -141,12 +163,18 @@ def main():
         write_to_file('dropshipping_products.json',
                       dropshipping_products, False)
 
+        # comment in if dropshipping products should saved as csv
         # dropshipping_products_to_csv(
         #     dropshipping_products, 'dropshipping_produkte')
 
         add_product_if_not_present(
             dropshipping_products, shopify_products)
+
         update_quantity_if_differ(dropshipping_products, shopify_products)
+
+        update_prices_of_products_if_differ(
+            dropshipping_products, shopify_products)
+
         delete_product_if_not_available_on_dropshipping(
             dropshipping_products, shopify_products)
     except:

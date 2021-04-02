@@ -69,7 +69,8 @@ def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True, gener
 
     items = []
     for index, brand in enumerate(all_brands):
-        logger.info(f"processing {index+1}/{len(all_brands)}")
+        logger.info(
+            f"processing {brand['name']} - {index+1}/{len(all_brands)}")
         response = get_brands_items(brand["id_brand"])
         parsed_response = parse_response(response)
         if parsed_response["num_rows"] > 0:

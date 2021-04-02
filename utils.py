@@ -6,6 +6,7 @@ from json.encoder import JSONEncoder
 import copy
 from datetime import date, datetime
 import os
+import re
 
 
 class ItemEncoder(JSONEncoder):
@@ -70,6 +71,13 @@ def dropshipping_products_to_csv(data: List[DropshippingItem], output):
                 f'{item.name},{item.category_object["group"]},{item.retail_price},{item.discount},{item.price},{item.get_selling_price()}\n')
 
 
+def price_comparison(data, output):
+    with open('response/' + output + '.txt', 'w+') as f:
+        for item in data:
+            f.writelines(
+                f'{item["title"]},{item["product_type"]},{item["variants"][0]["price"]},{item["new_price"]}\n')
+
+
 def get_timestamp():
     return str(datetime.now()).replace(":", "-")
 
@@ -89,3 +97,7 @@ def brand_equal_check_special_solution(input, collection):
             if t == c:
                 return True
     return False
+
+
+def get_dropshipping_id_from_shopify_product(shopify_item):
+    return re.findall(r'\d+', shopify_item['tags'])[0]
