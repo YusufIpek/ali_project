@@ -10,6 +10,8 @@ import cProfile
 
 
 def get_all_products_from_dropshipping(persist=False):
+    logger.info('retrieving products from dropshipping ...')
+
     # get all brands
     all_brands = dropshipping.get_brands()
 
@@ -34,6 +36,7 @@ def get_all_products_from_dropshipping(persist=False):
     if persist:
         write_to_file('dropshipping_products.json', all_items, False)
 
+    logger.info(f'{len(all_items)} products retrieved from dropshipping')
     return all_items
 
 
@@ -43,6 +46,8 @@ def get_all_watches_from_shopify(persist):
     # response = shopify.get_products_of_dropshipping(dropshipping_collection_id)
     # watches_from_shopify = parse_response(response.content)
 
+    logger.info('retrieving products from shopify ...')
+
     response = shopify.get_products()
     result = list(filter(lambda x: 'dropshipping' in x['tags'], response))
 
@@ -50,6 +55,7 @@ def get_all_watches_from_shopify(persist):
         write_to_file('shopify_dropshipping_products.json',
                       result, False)
 
+    logger.info(f'{len(result)} products retrieved from shopify')
     return result
 
 
