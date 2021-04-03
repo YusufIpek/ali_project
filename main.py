@@ -88,18 +88,21 @@ def update_prices_of_products_if_differ(dropshippping_products: List[Dropshippin
     logger.info('updating prices of products ...')
     counter = 0
     for item in shopify_products:
-        dp_item = list(filter(lambda x: x.id_product == get_dropshipping_id_from_shopify_product(
-            item), dropshippping_products))[0]
+        result = list(filter(lambda x: x.id_product == get_dropshipping_id_from_shopify_product(
+            item), dropshippping_products))
 
-        shopify_price = float(item['variants'][0]['price'])
-        dropshipping_price = dp_item.get_selling_price()
-        if dropshipping_price != shopify_price:
-            logger.info('update price of ' + item['title'] + ' from: ' + str(
-                item['variants'][0]['price']) + ' to ' + str(dropshipping_price))
-            shopify.set_price_of_product(
-                item["variants"][0]["id"], dropshipping_price)
+        if len(result):
+            dp_item = result[0]
 
-            counter += 1
+            shopify_price = float(item['variants'][0]['price'])
+            dropshipping_price = dp_item.get_selling_price()
+            if dropshipping_price != shopify_price:
+                logger.info('update price of ' + item['title'] + ' from: ' + str(
+                    item['variants'][0]['price']) + ' to ' + str(dropshipping_price))
+                shopify.set_price_of_product(
+                    item["variants"][0]["id"], dropshipping_price)
+
+                counter += 1
 
     logger.info(f'prices of {counter} products updated!')
 
