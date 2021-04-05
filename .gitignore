@@ -4,3 +4,4 @@ response/*
 __pycache__/*
 logs/*
 profiling/*
+connect_to_server.bash
