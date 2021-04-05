@@ -52,13 +52,13 @@ class DropshippingItem:
 
         if self.category_object["group"].lower() in uhren:
             if discount >= 65:
-                return myround(float(self.price) * 1.85)
+                return myround(float(self.price) * 1.75)
             elif discount >= 55:
-                return myround(float(self.price) * 1.80)
+                return myround(float(self.price) * 1.70)
             elif discount >= 40:
-                return myround(float(self.price) * 1.60)
-            else:
                 return myround(float(self.price) * 1.50)
+            else:
+                return myround(float(self.price) * 1.40)
         else:
             price = float(self.price)
             shipping_cost = 12
