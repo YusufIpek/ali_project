@@ -31,7 +31,7 @@ def get_specific_brands(data, *args):
 
 def keep_only_specific_brands(data):
     uhren = ['guess', 'pierre cardin', 'citizen', 'calvin klein',
-             'lacoste', 'liebeskind', 'nautica', 'olivia burton', 'police', 'breil']
+             'liebeskind', 'nautica', 'police', 'breil']
     schmuck = ['esprit', 'guess', 'pierre cardin',
                'swarovski']
 
