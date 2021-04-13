@@ -30,10 +30,10 @@ def get_specific_brands(data, *args):
 
 
 def keep_only_specific_brands(data):
-    uhren = ['guess', 'tommy hilfiger', 'pierre cardin', 'citizen', 'calvin klein',
+    uhren = ['guess', 'pierre cardin', 'citizen', 'calvin klein',
              'lacoste', 'liebeskind', 'nautica', 'olivia burton', 'police', 'breil']
     schmuck = ['esprit', 'guess', 'pierre cardin',
-               'swarovski', 'tommy hilfiger']
+               'swarovski']
 
     return list(filter(lambda x: x["group"].lower().strip() == 'uhren' and utils.brand_equal_check_special_solution(x["name"].lower().strip(), uhren)
                        or x["group"].lower().strip() == 'schmuck' and utils.brand_equal_check_special_solution(x["name"].lower().strip(), schmuck), data))
