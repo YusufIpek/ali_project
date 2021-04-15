@@ -171,6 +171,19 @@ def set_price_of_product(id, price):
     return response
 
 
+def set_retail_price_of_product(id, retail_price):
+    req_url = "admin/api/2021-01/variants/" + str(id) + ".json"
+    data = {
+        "variant": {
+            "id": id,
+            "inventory_management": "shopify",
+            "compare_at_price": str(retail_price)
+        }
+    }
+    response = do_put_request(req_url, data)
+    return response
+
+
 def set_inventory_of_product(inventory_item_id: int, stock: int):
     location_response = get_location()
     locations = parse_response(location_response)

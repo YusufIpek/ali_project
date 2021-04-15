@@ -96,11 +96,23 @@ def update_prices_of_products_if_differ(dropshippping_products: List[Dropshippin
 
             shopify_price = float(item['variants'][0]['price'])
             dropshipping_price = dp_item.get_selling_price()
+            shopify_retail_price = float(
+                item['variants'][0]['compare_at_price']) if item['variants'][0]['compare_at_price'] is not None else "null"
+            dropshipping_retail_price = float(dp_item.retail_price)
+
             if dropshipping_price != shopify_price:
                 logger.info('update price of ' + item['title'] + ' from: ' + str(
                     item['variants'][0]['price']) + ' to ' + str(dropshipping_price))
                 shopify.set_price_of_product(
                     item["variants"][0]["id"], dropshipping_price)
+
+                counter += 1
+
+            if dropshipping_retail_price != shopify_retail_price:
+                logger.info('update retail price of ' + item['title'] + ' from: ' + str(
+                    item['variants'][0]['compare_at_price']) + ' to ' + str(dropshipping_retail_price))
+                shopify.set_retail_price_of_product(
+                    item["variants"][0]["id"], dropshipping_retail_price)
 
                 counter += 1
 
@@ -127,6 +139,10 @@ def add_product_if_not_present(dropshipping_products: List[DropshippingItem], sh
             variants = response["product"]["variants"]
             shopify.set_price_of_product(
                 variants[0]["id"], dropshipping_item.get_selling_price())
+
+            # set compare price of product
+            shopify.set_retail_price_of_product(
+                variants[0]["id"], dropshipping_item.retail_price)
 
             # set quantity of product
             inventory_item_id = variants[0]["inventory_item_id"]

@@ -50,15 +50,25 @@ class DropshippingItem:
 
         def myround(x): return round(x, 1)  # rounding
 
-        if self.category_object["group"].lower() in uhren:
-            if discount >= 65:
-                return myround(float(self.price) * 1.75)
-            elif discount >= 55:
-                return myround(float(self.price) * 1.70)
-            elif discount >= 40:
-                return myround(float(self.price) * 1.50)
+        def special_price_calc(item, discount, price):
+            if price < 40 and discount < 70:
+                return item.retail_price
             else:
-                return myround(float(self.price) * 1.40)
+                return price
+
+        if self.category_object["group"].lower() in uhren:
+            if discount >= 75:
+                return special_price_calc(self, discount, myround(float(self.price) * 2.30))
+            elif discount >= 65:
+                return special_price_calc(self, discount, myround(float(self.price) * 2.20))
+            elif discount >= 55:
+                return special_price_calc(self, discount, myround(float(self.price) * 2.00))
+            elif discount >= 45:
+                return special_price_calc(self, discount, myround(float(self.price) * 1.70))
+            elif discount >= 40:
+                return special_price_calc(self, discount, myround(float(self.price) * 1.50))
+            else:
+                return myround(float(self.retail_price))
         else:
             price = float(self.price)
             shipping_cost = 12
