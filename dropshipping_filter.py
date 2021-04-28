@@ -12,8 +12,7 @@ def keep_only_adult_products(data: List[DropshippingItem]):
     groups = ["frau", "mann", "unisex"]
     result = []
     for item in data:
-        found = list(
-            filter(lambda x: x["group_name"] == "Geschlecht", item.attributes))
+        found = list(filter(lambda x: x["group_name"] == "Geschlecht", item.attributes))
         if len(found) > 0:
             if found[0]["value_name"].lower() in groups:
                 result.append(item)
@@ -21,7 +20,13 @@ def keep_only_adult_products(data: List[DropshippingItem]):
 
 
 def keep_only_products_with_images(data: List[DropshippingItem]):
-    return list(filter(lambda x: '.jpg' in x.image_path.lower() and 'noimage' not in x.image_path.lower(), data))
+    return list(
+        filter(
+            lambda x: ".jpg" in x.image_path.lower()
+            and "noimage" not in x.image_path.lower(),
+            data,
+        )
+    )
 
 
 def get_specific_brands(data, *args):
@@ -30,14 +35,100 @@ def get_specific_brands(data, *args):
 
 
 def keep_only_specific_brands(data):
-    uhren = ['guess', 'guess collection', 'guess 2013', 'guess connect', 'pierre cardin', 'citizen',
-             'ck calvin klein neue kollektion', 'liebeskind berlin', 'nautica', 'police', 'breil',
-             'casio', 'casio eu', 'seiko', 'timex', 'festina', 'esprit', 'just cavalli time uhren', 'lotus']
-    schmuck = ['esprit', 'guess schmuck', 'guess steel', 'guess neue kollektion', 'pierre cardin jewels',
-               'swarovski jewels']
+    uhren = [
+        "guess",
+        "guess collection",
+        "guess 2013",
+        "guess connect",
+        "pierre cardin",
+        "citizen",
+        "ck calvin klein neue kollektion",
+        "liebeskind berlin",
+        "nautica",
+        "police",
+        "breil",
+        "casio",
+        "casio eu",
+        "seiko",
+        "timex",
+        "festina",
+        "esprit",
+        "just cavalli time uhren",
+        "lotus",
+    ]
+    schmuck = [
+        "esprit",
+        "guess schmuck",
+        "guess steel",
+        "guess neue kollektion",
+        "pierre cardin jewels",
+        "swarovski jewels",
+    ]
 
-    return list(filter(lambda x: x["group"].lower().strip() == 'uhren' and utils.brand_equal_check_special_solution(x["name"].lower().strip(), uhren)
-                       or x["group"].lower().strip() == 'schmuck' and utils.brand_equal_check_special_solution(x["name"].lower().strip(), schmuck), data))
+    return list(
+        filter(
+            lambda x: x["group"].lower().strip() == "uhren"
+            and utils.brand_equal_check_special_solution(
+                x["name"].lower().strip(), uhren
+            )
+            or x["group"].lower().strip() == "schmuck"
+            and utils.brand_equal_check_special_solution(
+                x["name"].lower().strip(), schmuck
+            ),
+            data,
+        )
+    )
+
+
+def remove_watches_by_reference(data: List[DropshippingItem]):
+    references_to_remove = [
+        "GW0109L2",
+        "GW0111L2",
+        "GW0214G1",
+        "GW0214G2",
+        "GW0243L3",
+        "GW0248G2",
+        "GW0254L1",
+        "GW0257L1",
+        "GW0260G1",
+        "GW0262G2",
+        "GW0263G2",
+        "W0380G4",
+        "W0659G4",
+        "W0660G2",
+        "W0874G1",
+        "W0972G1",
+        "W0990G1",
+        "W0991G7",
+        "W1049G3",
+        "W1041G2",
+        "W1050G1",
+        "W1075G1",
+        "W1093L1",
+        "W1159L1",
+        "W1180G1",
+        "ESRG00961117",
+        "ESRG00961118",
+        "15032_1",
+        "10141_2",
+        "15150_A",
+        "15151_A",
+        "18240_1",
+        "18678_A",
+        "18678_B",
+        "18678_C",
+        "18678_D",
+        "18678_E",
+        "18678_F",
+        "18679_A",
+        "18679_B",
+        "18679_C",
+        "18679_D",
+        "18679_E",
+        "18679_F",
+        "18758_2",
+    ]
+    return list(filter(lambda x: x.reference not in references_to_remove, data))
 
 
 def drop_specific_brands(data, *args):
