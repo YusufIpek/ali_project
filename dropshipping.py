@@ -24,19 +24,16 @@ def data_payload(request_type, **kwargs):
         "lid": user_info["lid"],
         "key": user_info["key"],
         "request": request_type,
-        "api_version": api_info["version"]
-
+        "api_version": api_info["version"],
     }
     if kwargs.get("id_brand") is not None:
         data["id_brand"] = kwargs.get("id_brand")
         data["display_attributes"] = True
-    if kwargs.get('id_product') is not None:
+    if kwargs.get("id_product") is not None:
         data["id_product"] = kwargs.get("id_product")
         data["display_attributes"] = True
 
-    payload = {
-        "data": json.dumps(data)
-    }
+    payload = {"data": json.dumps(data)}
 
     return payload
 
@@ -60,7 +57,9 @@ def get_brands_items(id_brand):
     return make_request(payload)
 
 
-def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True, generate_base64_image=True):
+def brands_items_to_list(
+    all_brands, limit=-1, keep_empty_attributes=True, generate_base64_image=True
+):
     size = limit if limit > -1 else len(all_brands)
     logger.info(f"get watches and jewelry from {size} brands...")
 
@@ -69,8 +68,7 @@ def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True, gener
 
     items = []
     for index, brand in enumerate(all_brands):
-        logger.info(
-            f"processing {brand['name']} - {index+1}/{len(all_brands)}")
+        logger.info(f"processing {brand['name']} - {index+1}/{len(all_brands)}")
         response = get_brands_items(brand["id_brand"])
         parsed_response = parse_response(response)
         if parsed_response["num_rows"] > 0:
@@ -88,10 +86,12 @@ def brands_items_to_list(all_brands, limit=-1, keep_empty_attributes=True, gener
     products_with_attributes = []
     if not keep_empty_attributes:
         products_with_attributes = list(
-            filter(lambda x: x.attributes_available(), filtered))
+            filter(lambda x: x.attributes_available(), filtered)
+        )
 
     logger.info(
-        f"{len(filtered if keep_empty_attributes else products_with_attributes)} products retrieved from {size} brands")
+        f"{len(filtered if keep_empty_attributes else products_with_attributes)} products retrieved from {size} brands"
+    )
     return filtered if keep_empty_attributes else products_with_attributes
 
 
@@ -127,10 +127,10 @@ def product_items_to_list(brands_items, keep_empty_attributes=True):
 
 def get_item_image(url):
     response = requests.get(url)
-    return image_byte_to_base64(response.content).decode('utf-8')
+    return image_byte_to_base64(response.content).decode("utf-8")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # read config data and initialize api and user object
     init()
 
@@ -140,20 +140,19 @@ if __name__ == '__main__':
 
     # filter get only watches
     filtered_categories = dropshipping_filter.get_watches_and_jewelry(
-        parse_response(all_brands)["rows"])
-    filtered_categories_in_byte = json.dumps(
-        filtered_categories).encode('utf-8')
-    write_to_file("response/filtered_categories.json",
-                  filtered_categories_in_byte)
+        parse_response(all_brands)["rows"]
+    )
+    filtered_categories_in_byte = json.dumps(filtered_categories).encode("utf-8")
+    write_to_file("response/filtered_categories.json", filtered_categories_in_byte)
 
     filtered_brands = dropshipping_filter.drop_specific_brands(
-        filtered_categories, "disney")
-    filtered_brands_in_byte = json.dumps(filtered_brands).encode('utf-8')
+        filtered_categories, "disney"
+    )
+    filtered_brands_in_byte = json.dumps(filtered_brands).encode("utf-8")
     write_to_file("response/filtered_brands.json", filtered_brands_in_byte)
 
     # get all items of watches
-    all_items = brands_items_to_list(
-        filtered_brands, keep_empty_attributes=False)
+    all_items = brands_items_to_list(filtered_brands, keep_empty_attributes=False)
     # all_items_in_byte = json.dumps(all_items).encode('utf-8')
     # write_to_file("response/filtered_brands_items.json", all_items_in_byte)
     write_multiple_files(all_items)

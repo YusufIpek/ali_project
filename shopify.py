@@ -17,9 +17,7 @@ def init():
 
 
 def do_get_request(req_url, append_root_url=True):
-    headers = {
-        "X-Shopify-Access-Token": shopify["key"]
-    }
+    headers = {"X-Shopify-Access-Token": shopify["key"]}
     if append_root_url:
         return requests.get(shopify["url"] + req_url, headers=headers)
     else:
@@ -29,22 +27,20 @@ def do_get_request(req_url, append_root_url=True):
 def do_post_request(req_url, data):
     headers = {
         "X-Shopify-Access-Token": shopify["key"],
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     return requests.post(shopify["url"] + req_url, headers=headers, json=data)
 
 
 def do_delete_request(req_url):
-    headers = {
-        "X-Shopify-Access-Token": shopify["key"]
-    }
+    headers = {"X-Shopify-Access-Token": shopify["key"]}
     return requests.delete(shopify["url"] + req_url, headers=headers)
 
 
 def do_put_request(req_url, data):
     headers = {
         "X-Shopify-Access-Token": shopify["key"],
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     return requests.put(shopify["url"] + req_url, headers=headers, json=data)
 
@@ -55,8 +51,7 @@ def get_products():
     response = do_get_request(req_url)
     result.extend(parse_response(response.content)["products"])
     while "next" in response.links:
-        response = do_get_request(
-            response.links["next"]["url"], append_root_url=False)
+        response = do_get_request(response.links["next"]["url"], append_root_url=False)
         result.extend(parse_response(response.content)["products"])
 
     return result
@@ -72,8 +67,7 @@ def get_products_of_dropshipping(collection_id):
     response = do_get_request(req_url)
     result.extend(parse_response(response.content)["products"])
     while "next" in response.links:
-        response = do_get_request(
-            response.links["next"]["url"], append_root_url=False)
+        response = do_get_request(response.links["next"]["url"], append_root_url=False)
         result.extend(parse_response(response.content)["products"])
     return result
 
@@ -92,18 +86,15 @@ def add_product(item: DropshippingItem):
             "vendor": item.brand_name,
             "body_html": attributes_to_html(item),
             "product_type": item.get_product_type(),
-            "tags": [item.id_product, 'dropshipping'],
+            "tags": [item.id_product, "dropshipping"],
             "images": [
                 {
                     # "attachment": item.image_base64
                     "src": item.image_path  # product image will be downloaded by shopify
                 }
             ],
-            "shop": {
-                "id": 50964234406,
-                "currency": "EUR"
-            },
-            "published_scope": "web"
+            "shop": {"id": 50964234406, "currency": "EUR"},
+            "published_scope": "web",
         }
     }
     response = do_post_request(req_url, product)
@@ -115,7 +106,7 @@ def add_product_to_collect(product_id):
     data = {
         "collect": {
             "product_id": product_id,
-            "collection_id": 237585006758   # dropshipping category
+            "collection_id": 237585006758,  # dropshipping category
         }
     }
     response = do_post_request(req_url, data)
@@ -148,24 +139,24 @@ def get_variants_of_product(product_id):
 def get_collection_dropshipping_id():
     response = get_all_collections()
     parsed_response = parse_response(response.content)
-    filtered_collections = list(filter(lambda x: x["title"].lower(
-    ) == "dropshipping", parsed_response["custom_collections"]))
+    filtered_collections = list(
+        filter(
+            lambda x: x["title"].lower() == "dropshipping",
+            parsed_response["custom_collections"],
+        )
+    )
     return filtered_collections[0]["id"]
 
 
 def get_field_from_response(response, field: str):
     resp = parse_response(response)
-    return resp['product'][field]
+    return resp["product"][field]
 
 
 def set_price_of_product(id, price):
     req_url = "admin/api/2021-01/variants/" + str(id) + ".json"
     data = {
-        "variant": {
-            "id": id,
-            "inventory_management": "shopify",
-            "price": str(price)
-        }
+        "variant": {"id": id, "inventory_management": "shopify", "price": str(price)}
     }
     response = do_put_request(req_url, data)
     return response
@@ -177,7 +168,7 @@ def set_retail_price_of_product(id, retail_price):
         "variant": {
             "id": id,
             "inventory_management": "shopify",
-            "compare_at_price": str(retail_price)
+            "compare_at_price": str(retail_price),
         }
     }
     response = do_put_request(req_url, data)
@@ -192,13 +183,13 @@ def set_inventory_of_product(inventory_item_id: int, stock: int):
     data = {
         "location_id": location_id,
         "inventory_item_id": inventory_item_id,
-        "available": stock
+        "available": stock,
     }
     response = do_post_request(req_url, data)
     return response
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     init()
     logger.info("products count: " + str(get_products_count().content))
     dropshipping_collection_id = get_collection_dropshipping_id()

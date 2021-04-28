@@ -28,13 +28,17 @@ class DropshippingItem:
             "mann": "Herren",
             "frau": "Damen",
             "unisex": "Unisex",
-            "kind": "Kind"
+            "kind": "Kind",
         }
         found = list(
-            filter(lambda x: x["group_name"].lower() == 'geschlecht', self.attributes))
+            filter(lambda x: x["group_name"].lower() == "geschlecht", self.attributes)
+        )
 
         if len(found) > 0:
-            return mapping[found[0]["value_name"].lower()] + self.category_object["group"].strip()
+            return (
+                mapping[found[0]["value_name"].lower()]
+                + self.category_object["group"].strip()
+            )
         else:
             return "Unbekannt" + self.category_object["group"].strip()
 
@@ -48,7 +52,8 @@ class DropshippingItem:
         uhren = ["uhren", "watches"]
         discount = float(self.discount)
 
-        def myround(x): return round(x, 1)  # rounding
+        def myround(x):
+            return round(x, 1)  # rounding
 
         def special_price_calc(item, discount, price):
             if price < 40 and discount < 70:
@@ -58,15 +63,25 @@ class DropshippingItem:
 
         if self.category_object["group"].lower() in uhren:
             if discount >= 75:
-                return special_price_calc(self, discount, myround(float(self.price) * 2.30))
+                return special_price_calc(
+                    self, discount, myround(float(self.price) * 2.30)
+                )
             elif discount >= 65:
-                return special_price_calc(self, discount, myround(float(self.price) * 2.20))
+                return special_price_calc(
+                    self, discount, myround(float(self.price) * 2.20)
+                )
             elif discount >= 55:
-                return special_price_calc(self, discount, myround(float(self.price) * 2.00))
+                return special_price_calc(
+                    self, discount, myround(float(self.price) * 2.00)
+                )
             elif discount >= 45:
-                return special_price_calc(self, discount, myround(float(self.price) * 1.70))
+                return special_price_calc(
+                    self, discount, myround(float(self.price) * 1.70)
+                )
             elif discount >= 40:
-                return special_price_calc(self, discount, myround(float(self.price) * 1.50))
+                return special_price_calc(
+                    self, discount, myround(float(self.price) * 1.50)
+                )
             else:
                 return myround(float(self.retail_price))
         else:
