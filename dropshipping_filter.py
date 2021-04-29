@@ -136,5 +136,14 @@ def drop_specific_brands(data, *args):
     return list(filter(lambda x: x["name"].lower() not in args, data))
 
 
-def get_items_with_attributes(data):
-    return list(filter(lambda x: len(x.attributes) > 0, data))
+def keep_items_with_attributes(data):
+    brands_not_touch = ["pierre cardin"]
+    return list(
+        filter(
+            lambda x: utils.brand_equal_check_special_solution(
+                x.brand_name.lower().strip(), brands_not_touch
+            )
+            or len(x.attributes) > 0,
+            data,
+        )
+    )
