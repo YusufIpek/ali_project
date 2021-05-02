@@ -1,6 +1,7 @@
 from dropshipping_item import DropshippingItem
 from typing import List
 from utils import (
+    does_tags_differ,
     dropshipping_products_to_csv,
     get_dropshipping_id_from_shopify_product,
     get_timestamp,
@@ -24,7 +25,7 @@ def get_all_products_from_dropshipping(persist=False):
 
     # filter get only watches
     filtered_brands = dropshipping_filter.get_watches_and_jewelry(
-        dropshipping.parse_response(all_brands)["rows"]
+        dropshipping.parse_response(all_brands)["rows"], jewelry_add=False
     )
 
     write_to_file("all_brands.json", filtered_brands, False)
@@ -39,7 +40,7 @@ def get_all_products_from_dropshipping(persist=False):
         generate_base64_image=False,
     )
 
-    # remove children products
+    # remove kids products
     # all_items = dropshipping.keep_only_adult_products(all_items)
 
     all_items = dropshipping_filter.keep_items_with_attributes(all_items)
@@ -103,7 +104,7 @@ def update_quantity_if_differ(
 
 
 def update_prices_of_products_if_differ(
-    dropshippping_products: List[DropshippingItem], shopify_products
+    dropshipping_products: List[DropshippingItem], shopify_products
 ):
     logger.info("updating prices of products ...")
     counter = 0
@@ -112,7 +113,7 @@ def update_prices_of_products_if_differ(
             filter(
                 lambda x: x.id_product
                 == get_dropshipping_id_from_shopify_product(item),
-                dropshippping_products,
+                dropshipping_products,
             )
         )
 
@@ -207,6 +208,33 @@ def add_product_if_not_present(
     logger.info(f"{counter} products added")
 
 
+def update_tags_if_differs(
+    dropshipping_products: List[DropshippingItem], shopify_products
+):
+    logger.info("checking if tags have to be updated...")
+    count = 0
+    for shopify_item in shopify_products:
+        dropshipping_item = list(
+            filter(
+                lambda x: x.id_product
+                == get_dropshipping_id_from_shopify_product(shopify_item),
+                dropshipping_products,
+            )
+        )
+        if len(dropshipping_item):
+            if does_tags_differ(
+                shopify_item["tags"].replace(" ", "").split(","),
+                dropshipping_item[0].get_tags(),
+            ):
+                logger.info(f"updating tags of {shopify_item['title']}")
+                shopify.update_tags_of_product(
+                    shopify_item["id"], dropshipping_item[0].get_tags()
+                )
+                count += 1
+
+    logger.info(f"updated tags of {count} products")
+
+
 def delete_product_if_not_available_on_dropshipping(
     dropshipping_products: List[DropshippingItem], shopify_products
 ):
@@ -236,6 +264,9 @@ def main():
 
         shopify_products = get_all_watches_from_shopify(False)
         dropshipping_products = get_all_products_from_dropshipping(False)
+
+        # comment in if tags of already added products on shopify must be updated
+        # update_tags_if_differs(dropshipping_products, shopify_products)
 
         write_to_file("shopify_products.json", shopify_products, False)
         write_to_file("dropshipping_products.json", dropshipping_products, False)

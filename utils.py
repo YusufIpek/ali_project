@@ -100,3 +100,14 @@ def brand_equal_check_special_solution(input, collection):
 
 def get_dropshipping_id_from_shopify_product(shopify_item):
     return re.findall(r"\d+", shopify_item["tags"])[0]
+
+
+def does_tags_differ(shopify_tags, dropshipping_tags):
+    if len(shopify_tags) != len(dropshipping_tags):
+        return True
+
+    for dropshipping_tag in dropshipping_tags:
+        if dropshipping_tag not in shopify_tags:
+            return True
+
+    return False

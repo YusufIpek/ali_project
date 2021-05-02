@@ -48,6 +48,28 @@ class DropshippingItem:
             return self.name
         return self.name + " - " + self.reference
 
+    def get_tags(self):
+        tags = [self.id_product, "dropshipping"]
+        if self.is_product_smartwatch():
+            tags.append("smartwatch")
+        return tags
+
+    def is_product_smartwatch(self):
+        found = list(
+            filter(
+                lambda x: x["group_name"].lower() == "produktart"
+                and x["value_name"].lower() == "smartuhr",
+                self.attributes,
+            )
+        )
+        if len(found):
+            return True
+
+        if self.category_object["category"].lower() == "smart uhren":
+            return True
+
+        return False
+
     def get_selling_price(self):
         uhren = ["uhren", "watches"]
         discount = float(self.discount)

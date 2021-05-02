@@ -3,8 +3,14 @@ from dropshipping_item import DropshippingItem
 import utils
 
 
-def get_watches_and_jewelry(data):
-    groups = ["schmuck", "uhren", "watches", "jewelry"]
+def get_watches_and_jewelry(data, jewelry_add=True):
+    watch = ["uhren", "watches"]
+    jewelry = ["schmuck", "jewelry"]
+    groups = []
+    groups.extend(watch)
+    if jewelry_add:
+        groups.extend(jewelry)
+
     return list(filter(lambda x: x["group"].lower().strip() in groups, data))
 
 
@@ -44,26 +50,25 @@ def keep_only_specific_brands(data):
         "citizen",
         "ck calvin klein neue kollektion",
         "liebeskind berlin",
-        "nautica",
         "police",
         "breil",
         "casio",
         "casio eu",
         "seiko",
         "timex",
-        "festina",
         "esprit",
         "just cavalli time uhren",
-        "lotus",
+        "bering",
+        "armani exchange connected",
+        "emporio armani",
+        "emporio armani connected",
+        "emporio armani swiss made",
+        "marc ecko",
+        "marc ecko neue kollektion",
+        "pierre lannier",
+        "tommy hilfiger",
     ]
-    schmuck = [
-        "esprit",
-        "guess schmuck",
-        "guess steel",
-        "guess neue kollektion",
-        "pierre cardin jewels",
-        "swarovski jewels",
-    ]
+    schmuck = []
 
     return list(
         filter(

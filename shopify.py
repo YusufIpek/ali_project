@@ -86,7 +86,7 @@ def add_product(item: DropshippingItem):
             "vendor": item.brand_name,
             "body_html": attributes_to_html(item),
             "product_type": item.get_product_type(),
-            "tags": [item.id_product, "dropshipping"],
+            "tags": item.get_tags(),
             "images": [
                 {
                     # "attachment": item.image_base64
@@ -110,6 +110,13 @@ def add_product_to_collect(product_id):
         }
     }
     response = do_post_request(req_url, data)
+    return response
+
+
+def update_tags_of_product(product_id, tags):
+    req_url = f"/admin/api/2021-04/products/{product_id}.json"
+    data = {"product": {"id": product_id, "tags": tags}}
+    response = do_put_request(req_url, data)
     return response
 
 
