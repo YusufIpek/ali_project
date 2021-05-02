@@ -67,6 +67,8 @@ def keep_only_specific_brands(data):
         "marc ecko neue kollektion",
         "pierre lannier",
         "tommy hilfiger",
+        "puma smartwatch",
+        "dkny smartwatch",
     ]
     schmuck = []
 
