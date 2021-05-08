@@ -2,6 +2,34 @@ from typing import List
 from dropshipping_item import DropshippingItem
 import utils
 
+uhren = [
+    "guess",
+    "guess collection",
+    "guess 2013",
+    "guess connect",
+    "pierre cardin",
+    "citizen",
+    "ck calvin klein uhren",
+    "ck calvin klein neue kollektion",
+    "liebeskind berlin",
+    "police",
+    "breil",
+    "casio",
+    "casio eu",
+    "seiko",
+    "timex",
+    "esprit",
+    "just cavalli time uhren",
+    "bering",
+    "marc ecko",
+    "marc ecko neue kollektion",
+    "pierre lannier",
+    "tommy hilfiger",
+    "puma smartwatch",
+    "dkny smartwatch",
+]
+schmuck = []
+
 
 def get_watches_and_jewelry(data, jewelry_add=True):
     watch = ["uhren", "watches"]
@@ -40,34 +68,8 @@ def get_specific_brands(data, *args):
     return list(filter(lambda x: x["name"].lower() in args, data))
 
 
-def keep_only_specific_brands(data):
-    uhren = [
-        "guess",
-        "guess collection",
-        "guess 2013",
-        "guess connect",
-        "pierre cardin",
-        "citizen",
-        "ck calvin klein neue kollektion",
-        "liebeskind berlin",
-        "police",
-        "breil",
-        "casio",
-        "casio eu",
-        "seiko",
-        "timex",
-        "esprit",
-        "just cavalli time uhren",
-        "bering",
-        "marc ecko",
-        "marc ecko neue kollektion",
-        "pierre lannier",
-        "tommy hilfiger",
-        "puma smartwatch",
-        "dkny smartwatch",
-    ]
-    schmuck = []
-
+def keep_only_specific_brands(brands):
+    # keep specified brands and keep all smart watches
     return list(
         filter(
             lambda x: x["group"].lower().strip() == "uhren"
@@ -77,8 +79,26 @@ def keep_only_specific_brands(data):
             or x["group"].lower().strip() == "schmuck"
             and utils.brand_equal_check_special_solution(
                 x["name"].lower().strip(), schmuck
-            ),
-            data,
+            )
+            or x["category"].lower().strip() == "smart uhren",
+            brands,
+        )
+    )
+
+
+def filter_smartwatches(products: List[DropshippingItem]):
+    # in the products we have also products from brands which were not specified, because we wanted to retrieve also all
+    # smartwatches, thus here we remove watches which are not specified in the brands list and are not smart watches
+    return list(
+        filter(
+            lambda x: utils.brand_equal_check_special_solution(
+                x.category_object["name"].lower().strip(), uhren
+            )
+            or utils.brand_equal_check_special_solution(
+                x.category_object["name"].lower().strip(), schmuck
+            )
+            or x.is_product_smartwatch(),
+            products,
         )
     )
 
@@ -130,6 +150,8 @@ def remove_watches_by_reference(data: List[DropshippingItem]):
         "18679_E",
         "18679_F",
         "18758_2",
+        "DZT2020",
+        "DZT2021",
     ]
     return list(filter(lambda x: x.reference not in references_to_remove, data))
 

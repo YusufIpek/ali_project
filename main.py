@@ -43,6 +43,8 @@ def get_all_products_from_dropshipping(persist=False):
     # remove kids products
     # all_items = dropshipping.keep_only_adult_products(all_items)
 
+    all_items = dropshipping_filter.filter_smartwatches(all_items)
+
     all_items = dropshipping_filter.keep_items_with_attributes(all_items)
 
     all_items = dropshipping_filter.keep_only_products_with_images(all_items)

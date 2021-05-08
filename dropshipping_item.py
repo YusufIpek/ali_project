@@ -65,8 +65,9 @@ class DropshippingItem:
         if len(found):
             return True
 
-        if self.category_object["category"].lower() == "smart uhren":
-            return True
+        # unfortunately under the smartwatch category there are also watches which are not smartwatches, thus keep the below code commented out
+        # if self.category_object["category"].lower() == "smart uhren":
+        #     return True
 
         return False
 
