@@ -30,7 +30,9 @@ def get_all_products_from_dropshipping(persist=False):
 
     write_to_file("all_brands.json", filtered_brands, False)
 
-    filtered_brands = dropshipping_filter.keep_only_specific_brands(filtered_brands)
+    filtered_brands = dropshipping_filter.keep_only_specific_brands(
+        filtered_brands, include_all_smartwatches=False
+    )
 
     # get all items of watches
     all_items = dropshipping.brands_items_to_list(

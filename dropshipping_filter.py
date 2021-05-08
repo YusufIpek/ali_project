@@ -68,9 +68,10 @@ def get_specific_brands(data, *args):
     return list(filter(lambda x: x["name"].lower() in args, data))
 
 
-def keep_only_specific_brands(brands):
+def keep_only_specific_brands(brands, include_all_smartwatches=True):
+
     # keep specified brands and keep all smart watches
-    return list(
+    tmpList = list(
         filter(
             lambda x: x["group"].lower().strip() == "uhren"
             and utils.brand_equal_check_special_solution(
@@ -79,11 +80,15 @@ def keep_only_specific_brands(brands):
             or x["group"].lower().strip() == "schmuck"
             and utils.brand_equal_check_special_solution(
                 x["name"].lower().strip(), schmuck
-            )
-            or x["category"].lower().strip() == "smart uhren",
+            ),
             brands,
         )
     )
+    if include_all_smartwatches:
+        return list(
+            filter(lambda x: x["category"].lower().strip() == "smart uhren", tmpList)
+        )
+    return tmpList
 
 
 def filter_smartwatches(products: List[DropshippingItem]):
