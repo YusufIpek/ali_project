@@ -29,6 +29,7 @@ class DropshippingItem:
             "frau": "Damen",
             "unisex": "Unisex",
             "kind": "Kind",
+            "herren und damen": "Unisex",
         }
         found = list(
             filter(lambda x: x["group_name"].lower() == "geschlecht", self.attributes)
