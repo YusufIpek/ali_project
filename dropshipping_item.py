@@ -85,30 +85,43 @@ class DropshippingItem:
             else:
                 return price
 
+        result = 0.0
         if self.category_object["group"].lower() in uhren:
+            # price calculation for watches
             if discount >= 75:
-                return special_price_calc(
+                result = special_price_calc(
                     self, discount, myround(float(self.price) * 2.30)
                 )
             elif discount >= 65:
-                return special_price_calc(
+                result = special_price_calc(
                     self, discount, myround(float(self.price) * 2.20)
                 )
             elif discount >= 55:
-                return special_price_calc(
+                result = special_price_calc(
                     self, discount, myround(float(self.price) * 2.00)
                 )
             elif discount >= 45:
-                return special_price_calc(
+                result = special_price_calc(
                     self, discount, myround(float(self.price) * 1.70)
                 )
             elif discount >= 40:
-                return special_price_calc(
+                result = special_price_calc(
                     self, discount, myround(float(self.price) * 1.50)
                 )
             else:
-                return myround(float(self.retail_price))
+                result = myround(float(self.retail_price))
         else:
+            # price calculation for jewelry
             price = float(self.price)
             shipping_cost = 12
-            return myround((price + shipping_cost) + (price * 0.30))
+            result = myround((price + shipping_cost) + (price * 0.30))
+
+        if (
+            self.category_object["name"].lower().strip() == "esprit"
+            or self.category_object["name"].lower().strip() == "pierre cardin"
+        ):
+            result += 15
+        else:
+            result += 10
+
+        return result
