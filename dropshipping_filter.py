@@ -2,30 +2,10 @@ from typing import List
 from dropshipping_item import DropshippingItem
 import utils
 
-uhren = [
-    "guess",
-    "guess collection",
-    "guess 2013",
-    "guess connect",
-    "pierre cardin",
-    "citizen",
-    "ck calvin klein uhren",
-    "ck calvin klein neue kollektion",
-    "liebeskind berlin",
-    "police",
-    "breil",
-    "seiko",
-    "timex",
-    "esprit",
-    "bering",
-    "marc ecko",
-    "marc ecko neue kollektion",
-    "pierre lannier",
-    "tommy hilfiger",
-    "puma smartwatch",
-    "dkny smartwatch",
-]
+uhren = []
 schmuck = []
+with open("brands.txt", "r") as f:
+    uhren = f.read().splitlines()
 
 
 def get_watches_and_jewelry(data, jewelry_add=True):
@@ -106,55 +86,10 @@ def filter_smartwatches(products: List[DropshippingItem]):
 
 
 def remove_watches_by_reference(data: List[DropshippingItem]):
-    references_to_remove = [
-        "GW0109L2",
-        "GW0111L2",
-        "GW0214G1",
-        "GW0214G2",
-        "GW0243L3",
-        "GW0248G2",
-        "GW0254L1",
-        "GW0257L1",
-        "GW0260G1",
-        "GW0262G2",
-        "GW0263G2",
-        "W0380G4",
-        "W0659G4",
-        "W0660G2",
-        "W0874G1",
-        "W0972G1",
-        "W0990G1",
-        "W0991G7",
-        "W1049G3",
-        "W1041G2",
-        "W1050G1",
-        "W1075G1",
-        "W1093L1",
-        "W1159L1",
-        "W1180G1",
-        "ESRG00961117",
-        "ESRG00961118",
-        "15032_1",
-        "10141_2",
-        "15150_A",
-        "15151_A",
-        "18240_1",
-        "18678_A",
-        "18678_B",
-        "18678_C",
-        "18678_D",
-        "18678_E",
-        "18678_F",
-        "18679_A",
-        "18679_B",
-        "18679_C",
-        "18679_D",
-        "18679_E",
-        "18679_F",
-        "18758_2",
-        "DZT2020",
-        "DZT2021",
-    ]
+    references_to_remove = []
+    with open("watches_delete.txt", "r") as f:
+        references_to_remove = f.read().splitlines()
+
     return list(filter(lambda x: x.reference not in references_to_remove, data))
 
 
