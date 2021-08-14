@@ -1,2 +1,2 @@
 # Shopify 
-## Adding, Reading, Updating and Deleting products on Shopify
+- Adding, Reading, Updating and Deleting products on Shopify
