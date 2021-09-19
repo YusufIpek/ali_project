@@ -16,6 +16,7 @@ import re
 from log_handler import *
 import cProfile
 from brands import Brands
+import sys
 
 
 def get_all_products_from_dropshipping(persist=False):
@@ -32,6 +33,9 @@ def get_all_products_from_dropshipping(persist=False):
     write_to_file("all_brands.json", filtered_brands, False)
 
     brands = Brands()
+    if len(brands.uhren) == 0:
+        logger.info("no brands could be retrieved from google sheets, so shutdown!")
+        sys.exit("google sheets no brands!")
 
     filtered_brands = dropshipping_filter.keep_only_specific_brands(
         filtered_brands, brands.uhren, [], include_all_smartwatches=False
