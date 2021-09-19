@@ -5,3 +5,4 @@ __pycache__/*
 logs/*
 profiling/*
 connect_to_server.bash
+credentials.json

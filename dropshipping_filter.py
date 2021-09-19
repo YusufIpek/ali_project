@@ -2,11 +2,6 @@ from typing import List
 from dropshipping_item import DropshippingItem
 import utils
 
-uhren = []
-schmuck = []
-with open("brands.txt", "r") as f:
-    uhren = f.read().splitlines()
-
 
 def get_watches_and_jewelry(data, jewelry_add=True):
     watch = ["uhren", "watches"]
@@ -45,7 +40,9 @@ def get_specific_brands(data, *args):
     return list(filter(lambda x: x["name"].lower() in args, data))
 
 
-def keep_only_specific_brands(brands, include_all_smartwatches=True):
+def keep_only_specific_brands(
+    brands, uhren: List[str], schmuck=[], include_all_smartwatches=True
+):
 
     # keep specified brands and keep all smart watches
     tmpList = list(
@@ -68,9 +65,10 @@ def keep_only_specific_brands(brands, include_all_smartwatches=True):
     return tmpList
 
 
-def filter_smartwatches(products: List[DropshippingItem]):
+def filter_smartwatches(products: List[DropshippingItem], uhren: List[str], schmuck=[]):
     # in the products we have also products from brands which were not specified, because we wanted to retrieve also all
     # smartwatches, thus here we remove watches which are not specified in the brands list and are not smart watches
+
     return list(
         filter(
             lambda x: utils.brand_equal_check_special_solution(

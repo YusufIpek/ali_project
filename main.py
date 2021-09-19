@@ -15,6 +15,7 @@ import shopify
 import re
 from log_handler import *
 import cProfile
+from brands import Brands
 
 
 def get_all_products_from_dropshipping(persist=False):
@@ -30,8 +31,10 @@ def get_all_products_from_dropshipping(persist=False):
 
     write_to_file("all_brands.json", filtered_brands, False)
 
+    brands = Brands()
+
     filtered_brands = dropshipping_filter.keep_only_specific_brands(
-        filtered_brands, include_all_smartwatches=False
+        filtered_brands, brands.uhren, [], include_all_smartwatches=False
     )
 
     # get all items of watches
@@ -45,7 +48,7 @@ def get_all_products_from_dropshipping(persist=False):
     # remove kids products
     # all_items = dropshipping.keep_only_adult_products(all_items)
 
-    all_items = dropshipping_filter.filter_smartwatches(all_items)
+    all_items = dropshipping_filter.filter_smartwatches(all_items, brands.uhren, [])
 
     all_items = dropshipping_filter.keep_items_with_attributes(all_items)
 
