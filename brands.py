@@ -40,4 +40,5 @@ class Brands:
 
         values = result.get("values", [])
 
-        self.uhren = list(map(lambda x: x[0], values))
+        # get brands in lower case and trimmed
+        self.uhren = list(map(lambda x: x[0].lower().strip(), values))

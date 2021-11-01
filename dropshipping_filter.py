@@ -43,8 +43,6 @@ def get_specific_brands(data, *args):
 def keep_only_specific_brands(
     brands, uhren: List[str], schmuck=[], include_all_smartwatches=True
 ):
-    # to lower case
-    uhren = list(map(lambda x: x.lower().strip(), uhren))
 
     # keep specified brands and keep all smart watches
     tmpList = list(
